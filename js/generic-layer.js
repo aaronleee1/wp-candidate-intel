@@ -477,9 +477,25 @@
       const resp = await _fetchWithProxies(url);
       let data = await resp.json();
 
-      // Walk dataPath if set
-      const dp = document.getElementById('al-datapath').value.trim();
+      // Walk dataPath if already set
+      const dpInput = document.getElementById('al-datapath');
+      let dp = dpInput.value.trim();
       if (dp) data = dp.split('.').reduce((o, k) => o && o[k], data);
+
+      // If not an array, auto-detect the first key whose value is a non-empty array
+      if (!Array.isArray(data) && data && typeof data === 'object') {
+        const arrayKey = Object.keys(data).find(k => Array.isArray(data[k]) && data[k].length > 0);
+        if (arrayKey) {
+          dp = arrayKey;
+          dpInput.value = arrayKey;
+          data = data[arrayKey];
+        }
+      }
+
+      // ArcGIS REST: features[].attributes — unwrap one level deeper
+      if (Array.isArray(data) && data[0]?.attributes && typeof data[0].attributes === 'object') {
+        data = data.map(f => f.attributes);
+      }
 
       const first = Array.isArray(data) ? data[0] : data;
       if (!first || typeof first !== 'object') {
