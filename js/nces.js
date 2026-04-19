@@ -3,21 +3,31 @@
 async function loadNCES() {
   showLoading('Querying OpenStreetMap for US high schools...');
 
-  // Indexed tag filters only — regex queries cause 504 timeouts on nationwide bbox.
-  // school:level=secondary and isced:level use inverted indexes (fast).
+  // Broaden the query to capture more high schools in OSM.
+  // Keep the main filters narrow, but also include common school labels and relation objects.
   const bbox   = '(24,-125,50,-66)'; // continental US
   const bboxAK = '(51,-180,72,-129)';
   const bboxHI = '(18,-161,23,-154)';
-  const query = `[out:json][timeout:90];
+  const query = `[out:json][timeout:120];
 (
-  node["amenity"="school"]["school:level"="secondary"]${bbox};
-  node["amenity"="school"]["isced:level"="3"]${bbox};
-  way["amenity"="school"]["school:level"="secondary"]${bbox};
-  way["amenity"="school"]["isced:level"="3"]${bbox};
-  node["amenity"="school"]["school:level"="secondary"]${bboxAK};
-  way["amenity"="school"]["school:level"="secondary"]${bboxAK};
-  node["amenity"="school"]["school:level"="secondary"]${bboxHI};
-  way["amenity"="school"]["school:level"="secondary"]${bboxHI};
+  node["amenity"="school"]["school:level"~"(?i)(secondary|high_school|high school|high)"]${bbox};
+  way["amenity"="school"]["school:level"~"(?i)(secondary|high_school|high school|high)"]${bbox};
+  relation["amenity"="school"]["school:level"~"(?i)(secondary|high_school|high school|high)"]${bbox};
+  node["amenity"="school"]["isced:level"~"3|4"]${bbox};
+  way["amenity"="school"]["isced:level"~"3|4"]${bbox};
+  relation["amenity"="school"]["isced:level"~"3|4"]${bbox};
+  node["amenity"="school"]["school:type"~"(?i)(high|secondary)"]${bbox};
+  way["amenity"="school"]["school:type"~"(?i)(high|secondary)"]${bbox};
+  relation["amenity"="school"]["school:type"~"(?i)(high|secondary)"]${bbox};
+  node["amenity"="school"]["name"~"(?i)(high school|senior high|secondary school|highschool)"]${bbox};
+  way["amenity"="school"]["name"~"(?i)(high school|senior high|secondary school|highschool)"]${bbox};
+  relation["amenity"="school"]["name"~"(?i)(high school|senior high|secondary school|highschool)"]${bbox};
+  node["amenity"="school"]["school:level"~"(?i)(secondary|high_school|high school|high)"]${bboxAK};
+  way["amenity"="school"]["school:level"~"(?i)(secondary|high_school|high school|high)"]${bboxAK};
+  relation["amenity"="school"]["school:level"~"(?i)(secondary|high_school|high school|high)"]${bboxAK};
+  node["amenity"="school"]["school:level"~"(?i)(secondary|high_school|high school|high)"]${bboxHI};
+  way["amenity"="school"]["school:level"~"(?i)(secondary|high_school|high school|high)"]${bboxHI};
+  relation["amenity"="school"]["school:level"~"(?i)(secondary|high_school|high school|high)"]${bboxHI};
 );
 out center tags;`;
 
