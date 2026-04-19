@@ -1,0 +1,992 @@
+[
+  {
+    "number": "001",
+    "name": "Greater Alabama",
+    "zip": "35242",
+    "city": "Vestavia",
+    "state": "ALABAMA",
+    "address": "516 Liberty Pkwy",
+    "lat": 33.3813,
+    "lng": -86.7046
+  },
+  {
+    "number": "005",
+    "name": "Tukabatchee Area",
+    "zip": "36111",
+    "city": "Montgomery",
+    "state": "ALABAMA",
+    "address": "PO Box 11106",
+    "lat": 32.3374,
+    "lng": -86.2715
+  },
+  {
+    "number": "610",
+    "name": "Great Alaska",
+    "zip": "99504",
+    "city": "Anchorage",
+    "state": "ALASKA",
+    "address": "3117 Patterson St",
+    "lat": 61.2037,
+    "lng": -149.7447
+  },
+  {
+    "number": "010",
+    "name": "Grand Canyon",
+    "zip": "85250",
+    "city": "Scottsdale",
+    "state": "ARIZONA",
+    "address": "Boy Scouts Of America",
+    "lat": 33.5218,
+    "lng": -111.9049
+  },
+  {
+    "number": "018",
+    "name": "Natural State",
+    "zip": "72202",
+    "city": "Little Rock",
+    "state": "ARKANSAS",
+    "address": "3220 Cantrell Rd",
+    "lat": 34.7363,
+    "lng": -92.2741
+  },
+  {
+    "number": "047",
+    "name": "Golden Empire",
+    "zip": "95834",
+    "city": "Sacramento",
+    "state": "CALIFORNIA",
+    "address": "3851 N Freeway Blvd Ste 100",
+    "lat": 38.6383,
+    "lng": -121.5072
+  },
+  {
+    "number": "023",
+    "name": "Golden Gate Area",
+    "zip": "94588",
+    "city": "Pleasanton",
+    "state": "CALIFORNIA",
+    "address": "6601 Owens Dr Ste 100",
+    "lat": 37.6873,
+    "lng": -121.8957
+  },
+  {
+    "number": "033",
+    "name": "Greater Los Angeles Area",
+    "zip": "90026",
+    "city": "Los Angeles",
+    "state": "CALIFORNIA",
+    "address": "2333 Scout Way",
+    "lat": 34.0766,
+    "lng": -118.2646
+  },
+  {
+    "number": "053",
+    "name": "Los Padres",
+    "zip": "93110",
+    "city": "Santa Barbara",
+    "state": "CALIFORNIA",
+    "address": "4000 Modoc Rd",
+    "lat": 34.4418,
+    "lng": -119.7647
+  },
+  {
+    "number": "049",
+    "name": "San Diego-Imperial",
+    "zip": "92103",
+    "city": "San Diego",
+    "state": "CALIFORNIA",
+    "address": "1207 Upas St",
+    "lat": 32.7466,
+    "lng": -117.1636
+  },
+  {
+    "number": "062",
+    "name": "Adventure West",
+    "zip": "80632",
+    "city": "Greeley",
+    "state": "COLORADO",
+    "address": "PO Box 1166",
+    "lat": 40.3766,
+    "lng": -104.7629
+  },
+  {
+    "number": "061",
+    "name": "Greater Colorado",
+    "zip": "80215",
+    "city": "Denver",
+    "state": "COLORADO",
+    "address": "10455 W 6th Ave Ste 100",
+    "lat": 39.7435,
+    "lng": -105.1009
+  },
+  {
+    "number": "060",
+    "name": "Pathway to the Rockies",
+    "zip": "80919",
+    "city": "Colorado Springs",
+    "state": "COLORADO",
+    "address": "4775 Centennial Blvd Ste 107",
+    "lat": 38.9268,
+    "lng": -104.8464
+  },
+  {
+    "number": "066",
+    "name": "Connecticut Rivers",
+    "zip": "06103",
+    "city": "Hartford",
+    "state": "CONNECTICUT",
+    "address": "50 State House Sq Fl 5",
+    "lat": 41.7672,
+    "lng": -72.676
+  },
+  {
+    "number": "072",
+    "name": "Connecticut Yankee",
+    "zip": "06460",
+    "city": "Milford",
+    "state": "CONNECTICUT",
+    "address": "PO Box 32",
+    "lat": 41.2175,
+    "lng": -73.0549
+  },
+  {
+    "number": "081",
+    "name": "Del-Mar-Va",
+    "zip": "19904",
+    "city": "Dover",
+    "state": "DELAWARE",
+    "address": "1910 Baden Powell Way",
+    "lat": 39.1605,
+    "lng": -75.5974
+  },
+  {
+    "number": "083",
+    "name": "Central Florida",
+    "zip": "32703",
+    "city": "Apopka",
+    "state": "FLORIDA",
+    "address": "1951 S Orange Blossom Trl Ste 102",
+    "lat": 28.6354,
+    "lng": -81.4888
+  },
+  {
+    "number": "089",
+    "name": "Greater Tampa Bay Area",
+    "zip": "33612",
+    "city": "Tampa",
+    "state": "FLORIDA",
+    "address": "13228 N Central Ave",
+    "lat": 28.0502,
+    "lng": -82.45
+  },
+  {
+    "number": "773",
+    "name": "Gulf Coast",
+    "zip": "32514",
+    "city": "Pensacola",
+    "state": "FLORIDA",
+    "address": "9440 University Pkwy",
+    "lat": 30.5241,
+    "lng": -87.2167
+  },
+  {
+    "number": "087",
+    "name": "North Florida",
+    "zip": "32205",
+    "city": "Jacksonville",
+    "state": "FLORIDA",
+    "address": "521 Edgewood Ave S",
+    "lat": 30.3172,
+    "lng": -81.722
+  },
+  {
+    "number": "084",
+    "name": "South Florida",
+    "zip": "33330",
+    "city": "Davie",
+    "state": "FLORIDA",
+    "address": "3301 SW 142nd Ave",
+    "lat": 26.0663,
+    "lng": -80.3339
+  },
+  {
+    "number": "664",
+    "name": "Suwannee River Area",
+    "zip": "32308",
+    "city": "Tallahassee",
+    "state": "FLORIDA",
+    "address": "2032 Thomasville Rd",
+    "lat": 30.4771,
+    "lng": -84.2246
+  },
+  {
+    "number": "092",
+    "name": "Atlanta Area",
+    "zip": "30339",
+    "city": "Atlanta",
+    "state": "GEORGIA",
+    "address": "1800 Circle 75 Pkwy SE",
+    "lat": 33.8712,
+    "lng": -84.4629
+  },
+  {
+    "number": "099",
+    "name": "Coastal Georgia",
+    "zip": "31419",
+    "city": "Savannah",
+    "state": "GEORGIA",
+    "address": "11900 Abercorn St",
+    "lat": 31.9959,
+    "lng": -81.2358
+  },
+  {
+    "number": "104",
+    "name": "Aloha",
+    "zip": "96817",
+    "city": "Honolulu",
+    "state": "HAWAII",
+    "address": "42 Puiwa Rd",
+    "lat": 21.3295,
+    "lng": -157.8615
+  },
+  {
+    "number": "106",
+    "name": "Mountain West",
+    "zip": "83709",
+    "city": "Boise",
+    "state": "IDAHO",
+    "address": "8901 W Franklin Rd",
+    "lat": 43.5741,
+    "lng": -116.2941
+  },
+  {
+    "number": "144",
+    "name": "Abraham Lincoln",
+    "zip": "62703",
+    "city": "Springfield",
+    "state": "ILLINOIS",
+    "address": "5231 S 6th Street Rd",
+    "lat": 39.7622,
+    "lng": -89.6275
+  },
+  {
+    "number": "456",
+    "name": "Pathway to Adventure",
+    "zip": "60607",
+    "city": "Chicago",
+    "state": "ILLINOIS",
+    "address": "106 N Aberdeen St Ste 200",
+    "lat": 41.8721,
+    "lng": -87.6578
+  },
+  {
+    "number": "117",
+    "name": "Prairielands",
+    "zip": "61826",
+    "city": "Champaign",
+    "state": "ILLINOIS",
+    "address": "3301 Farber Drive",
+    "lat": 40.1131,
+    "lng": -88.3613
+  },
+  {
+    "number": "160",
+    "name": "Crossroads of America",
+    "zip": "46256",
+    "city": "Indianapolis",
+    "state": "INDIANA",
+    "address": "PO Box 56021",
+    "lat": 39.8977,
+    "lng": -86.0094
+  },
+  {
+    "number": "145",
+    "name": "Hoosier Trails",
+    "zip": "47401",
+    "city": "Bloomington",
+    "state": "INDIANA",
+    "address": "5625 E State Road 46",
+    "lat": 39.1401,
+    "lng": -86.5083
+  },
+  {
+    "number": "172",
+    "name": "Hawkeye Area",
+    "zip": "52404",
+    "city": "Cedar Rapids",
+    "state": "IOWA",
+    "address": "660 32nd Ave SW",
+    "lat": 41.9521,
+    "lng": -91.6853
+  },
+  {
+    "number": "177",
+    "name": "Mid-Iowa",
+    "zip": "50321",
+    "city": "Des Moines",
+    "state": "IOWA",
+    "address": "6123 Scout Trl",
+    "lat": 41.5476,
+    "lng": -93.6618
+  },
+  {
+    "number": "197",
+    "name": "Jayhawk Area",
+    "zip": "66612",
+    "city": "Topeka",
+    "state": "KANSAS",
+    "address": "1020 SE Monroe St",
+    "lat": 39.0427,
+    "lng": -95.6818
+  },
+  {
+    "number": "198",
+    "name": "Quivira",
+    "zip": "67220",
+    "city": "Wichita",
+    "state": "KANSAS",
+    "address": "3247 N Oliver St",
+    "lat": 37.7667,
+    "lng": -97.2805
+  },
+  {
+    "number": "204",
+    "name": "Blue Grass",
+    "zip": "40503",
+    "city": "Lexington",
+    "state": "KENTUCKY",
+    "address": "2134 Nicholasville Rd Ste 3",
+    "lat": 38.001,
+    "lng": -84.5282
+  },
+  {
+    "number": "211",
+    "name": "Istrouma Area",
+    "zip": "70809",
+    "city": "Baton Rouge",
+    "state": "LOUISIANA",
+    "address": "4307 Bluebonnet Blvd Ste B",
+    "lat": 30.4089,
+    "lng": -91.0842
+  },
+  {
+    "number": "215",
+    "name": "Norwela",
+    "zip": "71104",
+    "city": "Shreveport",
+    "state": "LOUISIANA",
+    "address": "3508 Beverly Pl",
+    "lat": 32.483,
+    "lng": -93.7349
+  },
+  {
+    "number": "218",
+    "name": "Pine Tree",
+    "zip": "04071",
+    "city": "Raymond",
+    "state": "MAINE",
+    "address": "146 Plains Rd",
+    "lat": 43.9219,
+    "lng": -70.4498
+  },
+  {
+    "number": "220",
+    "name": "Baltimore Area",
+    "zip": "21211",
+    "city": "Baltimore",
+    "state": "MARYLAND",
+    "address": "701 Wyman Park Dr",
+    "lat": 39.3316,
+    "lng": -76.6336
+  },
+  {
+    "number": "230",
+    "name": "Heart of New England",
+    "zip": "01543",
+    "city": "Rutland",
+    "state": "MASSACHUSETTS",
+    "address": "394 Pleasantdale Rd",
+    "lat": 42.3762,
+    "lng": -71.949
+  },
+  {
+    "number": "227",
+    "name": "The Spirit of Adventure",
+    "zip": "01801",
+    "city": "Woburn",
+    "state": "MASSACHUSETTS",
+    "address": "2 Tower Office Park",
+    "lat": 42.4829,
+    "lng": -71.1574
+  },
+  {
+    "number": "780",
+    "name": "Michigan Crossroads",
+    "zip": "48822",
+    "city": "Eagle",
+    "state": "MICHIGAN",
+    "address": "14258 Michigan St",
+    "lat": 42.8263,
+    "lng": -84.759
+  },
+  {
+    "number": "296",
+    "name": "Central Minnesota",
+    "zip": "56377",
+    "city": "Sartell",
+    "state": "MINNESOTA",
+    "address": "1191 Scout Dr",
+    "lat": 45.6318,
+    "lng": -94.2136
+  },
+  {
+    "number": "250",
+    "name": "Northern Star",
+    "zip": "55111",
+    "city": "Ft. Snelling",
+    "state": "MINNESOTA",
+    "address": "6202 Bloomington Rd",
+    "lat": 44.8828,
+    "lng": -93.2007
+  },
+  {
+    "number": "303",
+    "name": "Mississippi Riverlands",
+    "zip": "39232",
+    "city": "Flowood",
+    "state": "MISSISSIPPI",
+    "address": "2506 Lakeland Dr Ste 320",
+    "lat": 32.3299,
+    "lng": -90.0915
+  },
+  {
+    "number": "653",
+    "name": "Great Rivers",
+    "zip": "65203",
+    "city": "Columbia",
+    "state": "MISSOURI",
+    "address": "6081 W Van Horn Tavern Rd",
+    "lat": 38.9348,
+    "lng": -92.3639
+  },
+  {
+    "number": "307",
+    "name": "Heart of America",
+    "zip": "64131",
+    "city": "Kansas City",
+    "state": "MISSOURI",
+    "address": "10210 Holmes Rd",
+    "lat": 38.9713,
+    "lng": -94.5774
+  },
+  {
+    "number": "315",
+    "name": "Montana",
+    "zip": "59405",
+    "city": "Great Falls",
+    "state": "MONTANA",
+    "address": "820 17th Ave S",
+    "lat": 47.495,
+    "lng": -111.2502
+  },
+  {
+    "number": "324",
+    "name": "Cornhusker",
+    "zip": "68461",
+    "city": "Walton",
+    "state": "NEBRASKA",
+    "address": "PO Box 269",
+    "lat": 40.7975,
+    "lng": -96.5359
+  },
+  {
+    "number": "329",
+    "name": "Nevada Area",
+    "zip": "89521",
+    "city": "Reno",
+    "state": "NEVADA",
+    "address": "500 Double Eagle Ct",
+    "lat": 39.3809,
+    "lng": -119.6859
+  },
+  {
+    "number": "330",
+    "name": "Daniel Webster",
+    "zip": "03109",
+    "city": "Manchester",
+    "state": "NEW HAMPSHIRE",
+    "address": "1500 Bodwell Rd",
+    "lat": 42.9713,
+    "lng": -71.4135
+  },
+  {
+    "number": "347",
+    "name": "Monmouth",
+    "zip": "07751",
+    "city": "Morganville",
+    "state": "NEW JERSEY",
+    "address": "705 Ginesi Dr",
+    "lat": 40.3529,
+    "lng": -74.2779
+  },
+  {
+    "number": "333",
+    "name": "Northern New Jersey",
+    "zip": "07436",
+    "city": "Oakland",
+    "state": "NEW JERSEY",
+    "address": "P O Box 670",
+    "lat": 41.0294,
+    "lng": -74.2338
+  },
+  {
+    "number": "412",
+    "name": "High Desert",
+    "zip": "87109",
+    "city": "Albuquerque",
+    "state": "NEW MEXICO",
+    "address": "5841 Office Blvd NE",
+    "lat": 35.1506,
+    "lng": -106.569
+  },
+  {
+    "number": "388",
+    "name": "Greater Hudson Valley",
+    "zip": "12524",
+    "city": "Fishkill",
+    "state": "NEW YORK",
+    "address": "18 Westage Dr. #19",
+    "lat": 41.5404,
+    "lng": -73.8979
+  },
+  {
+    "number": "640",
+    "name": "Greater New York",
+    "zip": "10022",
+    "city": "New York",
+    "state": "NEW YORK",
+    "address": "155 E 56th St Fl 2",
+    "lat": 40.7571,
+    "lng": -73.9657
+  },
+  {
+    "number": "373",
+    "name": "Longhouse",
+    "zip": "13211",
+    "city": "Syracuse",
+    "state": "NEW YORK",
+    "address": "6712 Brooklawn Pkwy Ste 108",
+    "lat": 43.1036,
+    "lng": -76.1195
+  },
+  {
+    "number": "397",
+    "name": "Seneca Waterways",
+    "zip": "14623",
+    "city": "Rochester",
+    "state": "NEW YORK",
+    "address": "2320 Brighton",
+    "lat": 43.0834,
+    "lng": -77.6344
+  },
+  {
+    "number": "364",
+    "name": "Twin Rivers",
+    "zip": "12205",
+    "city": "Albany",
+    "state": "NEW YORK",
+    "address": "253 Washington Avenue Ext",
+    "lat": 42.7198,
+    "lng": -73.8207
+  },
+  {
+    "number": "415",
+    "name": "Mecklenburg County",
+    "zip": "28204",
+    "city": "Charlotte",
+    "state": "NORTH CAROLINA",
+    "address": "1410 E 7th St",
+    "lat": 35.2132,
+    "lng": -80.8231
+  },
+  {
+    "number": "421",
+    "name": "Occoneechee",
+    "zip": "27604",
+    "city": "Raleigh",
+    "state": "NORTH CAROLINA",
+    "address": "3231 Atlantic Ave",
+    "lat": 35.8334,
+    "lng": -78.5799
+  },
+  {
+    "number": "070",
+    "name": "Old North State",
+    "zip": "27408",
+    "city": "Greensboro",
+    "state": "NORTH CAROLINA",
+    "address": "1405 Westover Ter",
+    "lat": 36.1064,
+    "lng": -79.8165
+  },
+  {
+    "number": "429",
+    "name": "Northern Lights",
+    "zip": "58103",
+    "city": "Fargo",
+    "state": "NORTH DAKOTA",
+    "address": "4200 19th Ave S",
+    "lat": 46.8564,
+    "lng": -96.8123
+  },
+  {
+    "number": "436",
+    "name": "Buckeye",
+    "zip": "44708",
+    "city": "Canton",
+    "state": "OHIO",
+    "address": "2301 13th St NW",
+    "lat": 40.812,
+    "lng": -81.4241
+  },
+  {
+    "number": "438",
+    "name": "Dan Beard",
+    "zip": "45241",
+    "city": "Cincinnati",
+    "state": "OHIO",
+    "address": "10078 Reading Rd",
+    "lat": 39.2638,
+    "lng": -84.4092
+  },
+  {
+    "number": "440",
+    "name": "Lake Erie",
+    "zip": "44115",
+    "city": "Cleveland",
+    "state": "OHIO",
+    "address": "2241 Woodland Ave",
+    "lat": 41.4946,
+    "lng": -81.667
+  },
+  {
+    "number": "441",
+    "name": "Simon Kenton",
+    "zip": "43212",
+    "city": "Columbus",
+    "state": "OHIO",
+    "address": "807 Kinnear Rd",
+    "lat": 39.9874,
+    "lng": -83.0456
+  },
+  {
+    "number": "488",
+    "name": "Indian Nations",
+    "zip": "74146",
+    "city": "Tulsa",
+    "state": "OKLAHOMA",
+    "address": "4295 S Garnett Rd",
+    "lat": 36.1093,
+    "lng": -95.8506
+  },
+  {
+    "number": "480",
+    "name": "Last Frontier",
+    "zip": "73116",
+    "city": "Oklahoma City",
+    "state": "OKLAHOMA",
+    "address": "3031 NW 64th St",
+    "lat": 35.5463,
+    "lng": -97.5642
+  },
+  {
+    "number": "492",
+    "name": "Cascade Pacific",
+    "zip": "97008",
+    "city": "Beaverton",
+    "state": "OREGON",
+    "address": "9700 SW Nimbus Ave",
+    "lat": 45.456,
+    "lng": -122.7996
+  },
+  {
+    "number": "697",
+    "name": "Pacific Crest",
+    "zip": "97401",
+    "city": "Eugene",
+    "state": "OREGON",
+    "address": "2525 Martin Luther King Jr Blvd",
+    "lat": 44.0682,
+    "lng": -123.0819
+  },
+  {
+    "number": "525",
+    "name": "Cradle of Liberty",
+    "zip": "19406",
+    "city": "King Of Prussia",
+    "state": "PENNSYLVANIA",
+    "address": "901 E 8th Ave Ste 103",
+    "lat": 40.0956,
+    "lng": -75.3737
+  },
+  {
+    "number": "527",
+    "name": "Laurel Highlands",
+    "zip": "15219",
+    "city": "Pittsburgh",
+    "state": "PENNSYLVANIA",
+    "address": "1275 Bedford Ave",
+    "lat": 40.4423,
+    "lng": -79.983
+  },
+  {
+    "number": "544",
+    "name": "New Birth of Freedom",
+    "zip": "17019",
+    "city": "Dillsburg",
+    "state": "PENNSYLVANIA",
+    "address": "400 Tuckahoe Rd",
+    "lat": 40.0964,
+    "lng": -77.0339
+  },
+  {
+    "number": "501",
+    "name": "Northeastern Pennsylvania",
+    "zip": "18507",
+    "city": "Moosic",
+    "state": "PENNSYLVANIA",
+    "address": "72 Montage Mountain Road",
+    "lat": 41.3554,
+    "lng": -75.6805
+  },
+  {
+    "number": "777",
+    "name": "Washington Crossing",
+    "zip": "18901",
+    "city": "Doylestown",
+    "state": "PENNSYLVANIA",
+    "address": "1 Scout Way",
+    "lat": 40.3054,
+    "lng": -75.1489
+  },
+  {
+    "number": "546",
+    "name": "Narragansett",
+    "zip": "02921",
+    "city": "Cranston",
+    "state": "RHODE ISLAND",
+    "address": "223 Scituate Ave",
+    "lat": 41.7614,
+    "lng": -71.5061
+  },
+  {
+    "number": "553",
+    "name": "Indian Waters",
+    "zip": "29210",
+    "city": "Columbia",
+    "state": "SOUTH CAROLINA",
+    "address": "715 Betsy Dr",
+    "lat": 34.0479,
+    "lng": -81.1101
+  },
+  {
+    "number": "733",
+    "name": "Sioux",
+    "zip": "57104",
+    "city": "Sioux Falls",
+    "state": "SOUTH DAKOTA",
+    "address": "800 N West Ave",
+    "lat": 43.5514,
+    "lng": -96.7375
+  },
+  {
+    "number": "556",
+    "name": "Cherokee Area",
+    "zip": "37421",
+    "city": "Chattanooga",
+    "state": "TENNESSEE",
+    "address": "6031 Lee Hwy",
+    "lat": 35.025,
+    "lng": -85.1459
+  },
+  {
+    "number": "558",
+    "name": "Chickasaw",
+    "zip": "38112",
+    "city": "Memphis",
+    "state": "TENNESSEE",
+    "address": "171 S Hollywood St",
+    "lat": 35.1483,
+    "lng": -89.9729
+  },
+  {
+    "number": "560",
+    "name": "Middle Tennessee",
+    "zip": "37215",
+    "city": "Nashville",
+    "state": "TENNESSEE",
+    "address": "3414 Hillsboro Pike",
+    "lat": 36.0986,
+    "lng": -86.8219
+  },
+  {
+    "number": "583",
+    "name": "Alamo Area",
+    "zip": "78213",
+    "city": "San Antonio",
+    "state": "TEXAS",
+    "address": "2226 NW Military Hwy",
+    "lat": 29.5234,
+    "lng": -98.5273
+  },
+  {
+    "number": "564",
+    "name": "Capitol Area",
+    "zip": "78753",
+    "city": "Austin",
+    "state": "TEXAS",
+    "address": "12500 N I H 35",
+    "lat": 30.3648,
+    "lng": -97.6827
+  },
+  {
+    "number": "571",
+    "name": "Circle Ten",
+    "zip": "75235",
+    "city": "Dallas",
+    "state": "TEXAS",
+    "address": "8605 Harry Hines Blvd",
+    "lat": 32.8252,
+    "lng": -96.8388
+  },
+  {
+    "number": "662",
+    "name": "Longhorn",
+    "zip": "76054",
+    "city": "Hurst",
+    "state": "TEXAS",
+    "address": "PO Box 54190",
+    "lat": 32.8558,
+    "lng": -97.1755
+  },
+  {
+    "number": "576",
+    "name": "Sam Houston Area",
+    "zip": "77008",
+    "city": "Houston",
+    "state": "TEXAS",
+    "address": "2225 North Loop W",
+    "lat": 29.7991,
+    "lng": -95.4118
+  },
+  {
+    "number": "694",
+    "name": "South Plains",
+    "zip": "79412",
+    "city": "Lubbock",
+    "state": "TEXAS",
+    "address": "30 Briercroft Office Park",
+    "lat": 33.5463,
+    "lng": -101.8577
+  },
+  {
+    "number": "577",
+    "name": "South Texas",
+    "zip": "78411",
+    "city": "Corpus Christi",
+    "state": "TEXAS",
+    "address": "700 Everhart Rd Bldg A",
+    "lat": 27.7311,
+    "lng": -97.3877
+  },
+  {
+    "number": "590",
+    "name": "Crossroads of the West",
+    "zip": "84403",
+    "city": "Ogden",
+    "state": "UTAH",
+    "address": "1200 E 5400 S",
+    "lat": 41.1894,
+    "lng": -111.9489
+  },
+  {
+    "number": "592",
+    "name": "Green Mountain",
+    "zip": "05676",
+    "city": "Waterbury",
+    "state": "VERMONT",
+    "address": "PO Box 557",
+    "lat": 44.3451,
+    "lng": -72.7798
+  },
+  {
+    "number": "602",
+    "name": "Heart of Virginia",
+    "zip": "23228",
+    "city": "Henrico",
+    "state": "VIRGINIA",
+    "address": "8090 Villa Park Dr",
+    "lat": 37.625,
+    "lng": -77.4959
+  },
+  {
+    "number": "598",
+    "name": "Shenandoah Area",
+    "zip": "22602",
+    "city": "Winchester",
+    "state": "VIRGINIA",
+    "address": "107 Youth Development Ct",
+    "lat": 39.1501,
+    "lng": -78.269
+  },
+  {
+    "number": "611",
+    "name": "Inland Northwest",
+    "zip": "99201",
+    "city": "Spokane",
+    "state": "WASHINGTON",
+    "address": "411 W Boy Scout Way",
+    "lat": 47.6665,
+    "lng": -117.4365
+  },
+  {
+    "number": "612",
+    "name": "Pacific Harbors",
+    "zip": "98405",
+    "city": "Tacoma",
+    "state": "WASHINGTON",
+    "address": "4802 S 19th St",
+    "lat": 47.2484,
+    "lng": -122.4644
+  },
+  {
+    "number": "617",
+    "name": "Buckskin",
+    "zip": "25311",
+    "city": "Charleston",
+    "state": "WEST VIRGINIA",
+    "address": "2829 Kanawha Blvd E",
+    "lat": 38.349,
+    "lng": -81.5993
+  },
+  {
+    "number": "624",
+    "name": "Gateway Area",
+    "zip": "54601",
+    "city": "La Crosse",
+    "state": "WISCONSIN",
+    "address": "2600 Quarry Rd",
+    "lat": 43.7989,
+    "lng": -91.2175
+  },
+  {
+    "number": "620",
+    "name": "Glacier's Edge",
+    "zip": "53708",
+    "city": "Madison",
+    "state": "WISCONSIN",
+    "address": "PO Box 14135",
+    "lat": 43.0696,
+    "lng": -89.4239
+  }
+]

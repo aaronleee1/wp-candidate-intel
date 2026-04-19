@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>West Point Candidate Intelligence</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="data:,">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- Header Component -->
+<!-- To use: Include components/header.html -->
+<div id="header">
+  <h1>📍 West Point Candidate Intelligence</h1>
+  <div id="layer-controls">
+    <div class="layer-btn" id="btn-nces" style="--lc:#78a7c7" onclick="handleLayerToggle('nces')">
+      <span class="layer-dot" style="background:#78a7c7"></span>
+      High Schools
+      <span class="layer-status" id="status-nces">click to load</span>
+    </div>
+    <div class="layer-btn" id="btn-jrotc" style="--lc:#7ea98e" onclick="handleLayerToggle('jrotc')">
+      <span class="layer-dot" style="background:#7ea98e"></span>
+      JROTC Programs
+      <span class="layer-status" id="status-jrotc">click to load</span>
+    </div>
+    <div class="layer-btn" id="btn-bsa" style="--lc:#c2a072" onclick="handleLayerToggle('bsa')">
+      <span class="layer-dot" style="background:#c2a072"></span>
+      BSA Councils
+      <span class="layer-status" id="status-bsa">click to load</span>
+    </div>
+    <div class="layer-btn" id="btn-csv" style="--lc:#c0828d" onclick="toggleCSVIfLoaded()">
+      <span class="layer-dot" style="background:#c0828d"></span>
+      WP Applicants
+      <label class="csv-label" for="csvFile" onclick="event.stopPropagation()">Upload CSV</label>
+      <span class="layer-status" id="status-csv" style="display:none">on</span>
+      <input type="file" id="csvFile" accept=".csv" style="display:none">
+    </div>
+    <div class="layer-btn" id="btn-gap" style="--lc:#8876c9" onclick="toggleGapLayer()" title="Requires WP CSV + at least one of NCES/JROTC/BSA">
+      <span class="layer-dot" style="background:#8876c9"></span>
+      Gap Analysis
+      <span class="layer-status" id="status-gap">needs CSV</span>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Bar Component -->
+<!-- To use: Include components/stats-bar.html -->
+<div id="stats">
+  <div class="stat-item">High Schools: <span class="val c-nces" id="stat-nces">—</span></div>
+  <div class="stat-item">JROTC Programs: <span class="val c-jrotc" id="stat-jrotc">—</span></div>
+  <div class="stat-item">BSA Councils: <span class="val c-bsa" id="stat-bsa">—</span></div>
+  <div class="stat-item">WP Applicants: <span class="val c-csv" id="stat-csv">—</span></div>
+  <div class="stat-item">Gap Zips: <span class="val" style="color:#8876c9" id="stat-gap">—</span></div>
+</div>
+
+<div id="map-container">
+
+  <!-- Left Panel Component -->
+  <!-- To use: Include components/left-panel.html -->
+  <div id="left-panel">
+    <div id="left-panel-inner">
+      <div id="left-panel-header">
+        <h3>Top Gap Areas</h3>
+        <div id="left-panel-controls">
+          <label for="gap-top-n">Show top</label>
+          <input type="number" id="gap-top-n" value="25" min="5" max="200">
+          <label>areas</label>
+        </div>
+        <div id="gap-filter" style="margin-top:8px">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="blind">Not on Radar</button>
+          <button class="filter-btn" data-filter="under">Underrepresented</button>
+        </div>
+      </div>
+      <div id="left-panel-list">
+        <div id="left-panel-empty">Enable Gap Analysis layer and upload WP CSV to see top underrepresented areas.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="map">
+    <div id="left-panel-tab" onclick="toggleLeftPanel()">GAP LIST</div>
+  </div>
+
+  <!-- Sidebar Component -->
+  <!-- To use: Include components/sidebar.html -->
+  <div id="sidebar">
+    <div id="sidebar-inner">
+      <button id="sidebar-close">&times;</button>
+      <div id="sidebar-content"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Loading Component -->
+<!-- To use: Include components/loading.html -->
+<div id="loading">
+  <div class="spinner"></div>
+  <p id="loadingMsg">Loading...</p>
+</div>
+
+<script src="js/constants.js"></script>
+<script src="js/state.js"></script>
+<script src="js/legend.js"></script>
+<script src="js/helpers.js"></script>
+<script src="js/geocoding.js"></script>
+<script src="js/counties.js"></script>
+<script src="js/layer-handlers.js"></script>
+<script src="js/nces.js"></script>
+<script src="js/jrotc.js"></script>
+<script src="js/bsa.js"></script>
+<script src="js/csv.js"></script>
+<script src="js/gap.js"></script>
+<script src="js/sidebar.js"></script>
+<script src="js/left-panel.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>
