@@ -1,6 +1,21 @@
 // ─── HIGH SCHOOLS LAYER (OpenStreetMap via Overpass API) ─────────────────────
 
+const NCES_CACHE_KEY = 'wp_intel_nces_v1';
+const NCES_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+
 async function loadNCES() {
+  try {
+    const raw = localStorage.getItem(NCES_CACHE_KEY);
+    if (raw) {
+      const { ts, schools } = JSON.parse(raw);
+      if (Date.now() - ts < NCES_CACHE_TTL) {
+        layers.nces.data = schools;
+        document.getElementById('stat-nces').textContent = `(${schools.length.toLocaleString()})`;
+        return;
+      }
+    }
+  } catch {}
+
   showLoading('Querying OpenStreetMap for US high schools...');
 
   // Broaden the query to capture more high schools in OSM.
@@ -10,24 +25,21 @@ async function loadNCES() {
   const bboxHI = '(18,-161,23,-154)';
   const query = `[out:json][timeout:120];
 (
-  node["amenity"="school"]["school:level"~"(?i)(secondary|high_school|high school|high)"]${bbox};
-  way["amenity"="school"]["school:level"~"(?i)(secondary|high_school|high school|high)"]${bbox};
-  relation["amenity"="school"]["school:level"~"(?i)(secondary|high_school|high school|high)"]${bbox};
+  node["amenity"="school"]["school:level"~"secondary|high_school|high school|high",i]${bbox};
+  way["amenity"="school"]["school:level"~"secondary|high_school|high school|high",i]${bbox};
+  relation["amenity"="school"]["school:level"~"secondary|high_school|high school|high",i]${bbox};
   node["amenity"="school"]["isced:level"~"3|4"]${bbox};
   way["amenity"="school"]["isced:level"~"3|4"]${bbox};
   relation["amenity"="school"]["isced:level"~"3|4"]${bbox};
-  node["amenity"="school"]["school:type"~"(?i)(high|secondary)"]${bbox};
-  way["amenity"="school"]["school:type"~"(?i)(high|secondary)"]${bbox};
-  relation["amenity"="school"]["school:type"~"(?i)(high|secondary)"]${bbox};
-  node["amenity"="school"]["name"~"(?i)(high school|senior high|secondary school|highschool)"]${bbox};
-  way["amenity"="school"]["name"~"(?i)(high school|senior high|secondary school|highschool)"]${bbox};
-  relation["amenity"="school"]["name"~"(?i)(high school|senior high|secondary school|highschool)"]${bbox};
-  node["amenity"="school"]["school:level"~"(?i)(secondary|high_school|high school|high)"]${bboxAK};
-  way["amenity"="school"]["school:level"~"(?i)(secondary|high_school|high school|high)"]${bboxAK};
-  relation["amenity"="school"]["school:level"~"(?i)(secondary|high_school|high school|high)"]${bboxAK};
-  node["amenity"="school"]["school:level"~"(?i)(secondary|high_school|high school|high)"]${bboxHI};
-  way["amenity"="school"]["school:level"~"(?i)(secondary|high_school|high school|high)"]${bboxHI};
-  relation["amenity"="school"]["school:level"~"(?i)(secondary|high_school|high school|high)"]${bboxHI};
+  node["amenity"="school"]["school:type"~"high|secondary",i]${bbox};
+  way["amenity"="school"]["school:type"~"high|secondary",i]${bbox};
+  relation["amenity"="school"]["school:type"~"high|secondary",i]${bbox};
+  node["amenity"="school"]["school:level"~"secondary|high_school|high school|high",i]${bboxAK};
+  way["amenity"="school"]["school:level"~"secondary|high_school|high school|high",i]${bboxAK};
+  relation["amenity"="school"]["school:level"~"secondary|high_school|high school|high",i]${bboxAK};
+  node["amenity"="school"]["school:level"~"secondary|high_school|high school|high",i]${bboxHI};
+  way["amenity"="school"]["school:level"~"secondary|high_school|high school|high",i]${bboxHI};
+  relation["amenity"="school"]["school:level"~"secondary|high_school|high school|high",i]${bboxHI};
 );
 out center tags;`;
 
@@ -46,9 +58,14 @@ out center tags;`;
   for (const url of mirrors) {
     updateLoading(`Querying OpenStreetMap${url !== OVERPASS_API ? ' (mirror)' : ''}...`);
     try {
-      res = await fetchWithTimeout(url, 100000, postOpts);
+      res = await fetchWithTimeout(url, 60000, postOpts);
       if (res.ok) break;
-    } catch { res = null; }
+      console.warn(`Overpass ${url} → HTTP ${res.status}`);
+      res = null;
+    } catch (e) {
+      console.warn(`Overpass ${url} → ${e.message}`);
+      res = null;
+    }
   }
   if (!res || !res.ok) throw new Error('Could not reach the Overpass API. Check your internet connection.');
 
@@ -98,6 +115,10 @@ out center tags;`;
       cbsa:           ''
     });
   }
+
+  try {
+    localStorage.setItem(NCES_CACHE_KEY, JSON.stringify({ ts: Date.now(), schools }));
+  } catch {}
 
   layers.nces.data = schools;
   document.getElementById('stat-nces').textContent = `(${schools.length.toLocaleString()})`;
