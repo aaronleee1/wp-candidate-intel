@@ -1,6 +1,6 @@
 // ─── HIGH SCHOOLS LAYER (CDC PLACES — health metrics by ZIP, US only) ─────────
 
-const NCES_CACHE_KEY = 'wp_intel_nces_v12';
+const NCES_CACHE_KEY = 'wp_intel_nces_v13';
 const NCES_CACHE_TTL = 24 * 60 * 60 * 1000;
 
 const CDC_PLACES_URL = 'https://data.cdc.gov/resource/qnzd-25i4.json'; // ZCTA (ZIP) level
@@ -94,7 +94,7 @@ async function loadNCES() {
       name:   meta.locationname,
       lat, lng,
       zip,
-      city:   meta.locationname || '',
+      city:   zip,
       state:  '',
       health: zipHealth[zip]    || {},
       // compatibility fields
@@ -105,6 +105,17 @@ async function loadNCES() {
       congressDist: '', stateLegLower: '', stateLegUpper: '',
       countyCode: '', cbsa: ''
     });
+  }
+
+  // Geocode all ZIPs to get real city/state names (cached after first run)
+  const uniqueZips = [...new Set(schools.map(s => s.zip))];
+  updateLoading(`Geocoding ${uniqueZips.length.toLocaleString()} ZIP codes (cached after first run)…`);
+  const geoData = await geocodeMany(uniqueZips, (done, total) => {
+    updateLoading(`Geocoding health ZIPs… ${done.toLocaleString()}/${total.toLocaleString()}`);
+  });
+  for (const s of schools) {
+    const g = geoData[s.zip];
+    if (g) { s.city = g.city; s.state = g.state; }
   }
 
   try {
