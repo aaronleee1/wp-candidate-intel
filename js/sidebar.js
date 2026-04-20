@@ -11,7 +11,7 @@ function openSidebar(zip, city, state, bsaCouncil) {
     if (group.length) {
       html += `
       <div class="sb-section">
-        <h3 style="color:#4dabf7">&#9632; High Schools (${group.length})</h3>
+        <h3 style="color:#4dabf7">&#9632; Health Data (${group.length})</h3>
         <ul class="school-list">
           ${[...group].sort((a,b) => a.name.localeCompare(b.name)).map(s => {
             const addr    = [s.street, s.city, s.state].filter(Boolean).join(', ');
@@ -26,11 +26,20 @@ function openSidebar(zip, city, state, bsaCouncil) {
             return `<li>
               <b>${s.name}</b>
               ${s.type && s.type !== 'Public' ? `<span class="meta"> · ${s.type}</span>` : ''}
+              ${s.locale ? `<span class="meta"> · ${s.locale}</span>` : ''}
               ${meta.length    ? `<div class="meta">${meta.join(' &middot; ')}</div>` : ''}
               ${contact.length ? `<div class="meta">${contact.join(' &middot; ')}</div>` : ''}
             </li>`;
           }).join('')}
         </ul>
+        ${(() => {
+          const health = group[0]?.health || {};
+          const rows = (window.NCES_HEALTH_MEASURES || [])
+            .filter(m => health[m.id] != null)
+            .map(m => `<div class="stat-row"><span class="lbl">${m.label}</span><span class="val">${health[m.id].toFixed(1)}%</span></div>`)
+            .join('');
+          return rows ? `<div style="margin-top:8px"><div class="meta" style="margin-bottom:4px;color:#aaa">Community Health (ZIP ${group[0].zip})</div>${rows}</div>` : '';
+        })()}
       </div>`;
     }
   }
@@ -140,6 +149,11 @@ function openSidebar(zip, city, state, bsaCouncil) {
         <div class="stat-row"><span class="lbl">Pipeline Signals</span><span class="val" style="text-align:right;max-width:190px;font-size:0.75rem">${signals.join(', ') || 'None'}</span></div>
         <div class="stat-row"><span class="lbl">Athletic Signal</span><span class="val" style="font-size:0.75rem">${athLabel}</span></div>
         <div class="stat-row"><span class="lbl">Score Multiplier</span><span class="val">${gz.multiplier.toFixed(2)}×</span></div>
+        ${gz.healthMult != null ? `
+        <div class="stat-row"><span class="lbl">Health Multiplier</span><span class="val" style="color:${gz.healthMult >= 1 ? '#51cf66' : '#ff6b6b'}">${gz.healthMult.toFixed(2)}× ${gz.healthMult >= 1.05 ? '↑ fit pool' : gz.healthMult <= 0.95 ? '↓ unfit pool' : ''}</span></div>
+        ${gz.health?.LPA     != null ? `<div class="stat-row"><span class="lbl" style="padding-left:12px">Physically Inactive</span><span class="val">${gz.health.LPA.toFixed(1)}%</span></div>` : ''}
+        ${gz.health?.OBESITY != null ? `<div class="stat-row"><span class="lbl" style="padding-left:12px">Obesity</span><span class="val">${gz.health.OBESITY.toFixed(1)}%</span></div>` : ''}
+        ` : ''}
       </div>`;
     }
   }

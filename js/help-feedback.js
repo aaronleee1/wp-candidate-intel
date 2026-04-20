@@ -110,9 +110,39 @@ const HELP_STEPS = [
         <li><span class="step-n">2</span><span>Upload your WP Applicants CSV.</span></li>
         <li><span class="step-n">3</span><span>Click <span class="help-tag">Gap Analysis</span> — a purple heatmap appears.</span></li>
       </ul>
-      <p>ZIP codes are scored by combining pipeline signals (JROTC/BSA presence) and WP representation. Two types of gaps are identified:</p>
+      <p>Two types of gaps are identified:</p>
       <p><span style="color:#ff3333;font-weight:600">Not on Radar</span> — ZIP codes with zero WP records but significant pipeline signals.</p>
       <p><span style="color:#cc66ff;font-weight:600">Underrepresented</span> — ZIP codes with some WP records but fewer than expected given their pipeline signals.</p>
+
+      <h2 style="margin-top:14px">How the Score is Calculated</h2>
+      <p>Each ZIP code receives a <b>Gap Score</b> — higher means higher recruiting priority.</p>
+
+      <p style="margin-top:8px"><b>Step 1 — Pipeline Multiplier</b></p>
+      <p>Starts at 1.0. Boosted by presence of youth pipeline programs:</p>
+      <ul class="help-steps-list">
+        <li><span class="step-n">×</span><span>JROTC program present → <b>×1.5</b></span></li>
+        <li><span class="step-n">×</span><span>3+ JROTC programs → additional <b>×1.2</b></span></li>
+        <li><span class="step-n">×</span><span>BSA Council present → <b>×1.2</b></span></li>
+      </ul>
+
+      <p style="margin-top:8px"><b>Step 2 — Health Multiplier</b> <span style="color:#aaa;font-size:0.8rem">(from CDC PLACES)</span></p>
+      <p>Adjusts for community fitness — areas with lower physical inactivity and obesity rates have a larger pool of physically eligible candidates:</p>
+      <ul class="help-steps-list">
+        <li><span class="step-n">↑</span><span>Physical inactivity below 25% national avg → boost up to <b>×1.25</b></span></li>
+        <li><span class="step-n">↓</span><span>Physical inactivity above 25% → reduction down to <b>×0.75</b></span></li>
+        <li><span class="step-n">↑</span><span>Obesity below 31% national avg → boost up to <b>×1.15</b></span></li>
+        <li><span class="step-n">↓</span><span>Obesity above 31% → reduction down to <b>×0.85</b></span></li>
+      </ul>
+      <p>Combined health multiplier is capped between <b>0.6×</b> and <b>1.4×</b>.</p>
+
+      <p style="margin-top:8px"><b>Step 3 — Athletic Modifier</b></p>
+      <p>Added based on sports participation in existing WP applicant records: <b>+2</b> if no athletes, <b>+1</b> if &lt;10% athletes, <b>+0</b> otherwise.</p>
+
+      <p style="margin-top:8px"><b>Final Score</b></p>
+      <p>If zero WP records: <code style="color:#c084fc">999 + (multiplier × 10) + (athleticMod × 5)</code></p>
+      <p>If some WP records: <code style="color:#c084fc">(multiplier + athleticMod) / repRatio</code></p>
+      <p style="color:#aaa;font-size:0.8rem">repRatio = WP applicant count ÷ 0.5 (assumed 500-student cohort baseline)</p>
+
       <div class="help-tip">Open the <b>GAP LIST</b> tab on the left edge of the map to see a ranked list of top gap areas filtered by region.</div>
     `,
   },
