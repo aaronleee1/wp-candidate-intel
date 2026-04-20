@@ -47,12 +47,22 @@ async function geocodeSingle(zip) {
   } catch { return null; }
 }
 
+// ZIPs that zippopotam.us doesn't cover: military overseas (09xxx),
+// territories (00xxx = PR/VI, 96xxx non-Hawaii, 969xx = Guam/Saipan)
+function _isUngeocodableZip(zip) {
+  if (/^09\d{3}$/.test(zip)) return true; // military APO/FPO
+  if (/^00\d{3}$/.test(zip)) return true; // Puerto Rico, Virgin Islands
+  if (/^969\d{2}$/.test(zip)) return true; // Guam, CNMI
+  return false;
+}
+
 async function geocodeMany(zips, onProgress) {
   const cache = loadZipCache();
   const results = {};
   const toFetch = [];
 
   for (const z of zips) {
+    if (_isUngeocodableZip(z)) continue;
     if (cache[z]) results[z] = cache[z];
     else toFetch.push(z);
   }

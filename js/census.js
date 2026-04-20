@@ -1,136 +1,88 @@
-// ─── CENSUS ACS YOUTH POPULATION LAYER (2024 5-Year Estimates) ───────────────
-// Variables: B01001_006E male 15-17, B01001_007E male 18-19,
-//            B01001_030E female 15-17, B01001_031E female 18-19
+// ─── CENSUS POPULATION ESTIMATES LAYER (2023 PEP, Ages 15-19 by County) ──────
+// AGE=4 → 15-19 age group in the PEP characteristic/agegroups endpoint
+
+const CENSUS_PEP_URL = 'https://api.census.gov/data/2023/pep/characteristic/agegroups';
 
 async function loadCensus() {
-  showLoading('Connecting to US Census ACS 2024...');
+  showLoading('Loading Census teen population estimates...');
 
-  const vars = 'B01001_006E,B01001_007E,B01001_030E,B01001_031E';
-  const url  = `${CENSUS_ACS_API}?get=NAME,${vars}&for=zip%20code%20tabulation%20area:*`;
+  // ── 1. County centroids from GeoJSON ────────────────────────────────────────
+  await ensureCountyGeoJSON();
+  const centroids = {};
+  for (const f of (countyGeoJSON?.features || [])) {
+    const c = _geojsonCentroid(f.geometry);
+    if (c) centroids[f.id] = c;
+  }
+
+  // ── 2. Fetch teen population (15–19) for every county ───────────────────────
+  updateLoading('Fetching Census population estimates...');
+  const url = `${CENSUS_PEP_URL}?get=NAME,POP,AGE&AGE=4&for=county:*`;
 
   let res = null;
-  for (const attempt of [url,
-                         CORS_PROXY  + url,
-                         CORS_PROXY2 + encodeURIComponent(url)]) {
+  for (const attempt of [url, CORS_PROXY + encodeURIComponent(url), CORS_PROXY2 + encodeURIComponent(url)]) {
     try {
       res = await fetchWithTimeout(attempt, 40000);
       if (res.ok) break;
     } catch { res = null; }
   }
-  if (!res || !res.ok) throw new Error('Could not reach the Census ACS 2024 API. Check your internet connection.');
+  if (!res || !res.ok) throw new Error('Could not reach the Census Population Estimates API.');
 
   const raw = await res.json();
-  if (!Array.isArray(raw) || raw.length < 2) throw new Error('Unexpected response from Census ACS API.');
+  if (!Array.isArray(raw) || raw.length < 2) throw new Error('Unexpected response from Census PEP API.');
 
-  const header = raw[0];
-  const iM15  = header.indexOf('B01001_006E');
-  const iM18  = header.indexOf('B01001_007E');
-  const iF15  = header.indexOf('B01001_030E');
-  const iF18  = header.indexOf('B01001_031E');
-  const iZip  = header.indexOf('zip code tabulation area');
+  const header  = raw[0];
+  const iPop    = header.indexOf('POP');
+  const iState  = header.indexOf('state');
+  const iCounty = header.indexOf('county');
+  const iName   = header.indexOf('NAME');
 
-  updateLoading('Matching youth population to locations...');
-
-  // ── Build ZIP → coords from every available source ────────────────────────
-  const zipCoords = {};
-
-  // 1. NCES schools (centroid per ZIP — most comprehensive if loaded)
-  if (layers.nces.data && layers.nces.data.length) {
-    const acc = {};
-    for (const s of layers.nces.data) {
-      if (!s.zip) continue;
-      if (!acc[s.zip]) acc[s.zip] = { latSum: 0, lngSum: 0, n: 0, city: s.city, state: s.state };
-      acc[s.zip].latSum += s.lat;
-      acc[s.zip].lngSum += s.lng;
-      acc[s.zip].n++;
-    }
-    for (const [z, a] of Object.entries(acc)) {
-      zipCoords[z] = { lat: a.latSum / a.n, lng: a.lngSum / a.n, city: a.city, state: a.state };
-    }
-  }
-
-  // 2. JROTC schools
-  if (layers.jrotc.data) {
-    for (const s of layers.jrotc.data) {
-      if (!s.zip || zipCoords[s.zip]) continue;
-      if (isValidCoord(s.lat, s.lng))
-        zipCoords[s.zip] = { lat: s.lat, lng: s.lng, city: s.city || '', state: s.state || '' };
-    }
-  }
-
-  // 3. BSA councils
-  if (layers.bsa.data) {
-    for (const c of layers.bsa.data) {
-      if (!c.zip || zipCoords[c.zip]) continue;
-      if (isValidCoord(c.lat, c.lng))
-        zipCoords[c.zip] = { lat: c.lat, lng: c.lng, city: c.city || '', state: c.state || '' };
-    }
-  }
-
-  // 4. Geocoding cache from localStorage
-  try {
-    const cache = JSON.parse(localStorage.getItem('wpZipGeo_v2')) || {};
-    for (const [z, c] of Object.entries(cache)) {
-      if (!zipCoords[z] && isValidCoord(c.lat, c.lng)) zipCoords[z] = c;
-    }
-  } catch {}
-
-  // ── Parse ACS rows ────────────────────────────────────────────────────────
+  // ── 3. Build records ─────────────────────────────────────────────────────────
+  updateLoading('Matching population to counties...');
   const records = [];
+
   for (let i = 1; i < raw.length; i++) {
     const row  = raw[i];
-    const zip  = normalizeZip(row[iZip]);
-    if (!zip) continue;
+    const fips = (row[iState] || '').padStart(2, '0') + (row[iCounty] || '').padStart(3, '0');
+    const pop  = Math.max(0, parseInt(row[iPop], 10) || 0);
+    if (!pop) continue;
 
-    const m15  = Math.max(0, parseInt(row[iM15], 10) || 0);
-    const m18  = Math.max(0, parseInt(row[iM18], 10) || 0);
-    const f15  = Math.max(0, parseInt(row[iF15], 10) || 0);
-    const f18  = Math.max(0, parseInt(row[iF18], 10) || 0);
-    const youth = m15 + m18 + f15 + f18;
-    if (youth <= 0) continue;
+    const center = centroids[fips];
+    if (!center) continue;
 
-    const coords = zipCoords[zip];
-    if (!coords) continue;
-
+    const nameParts = (row[iName] || '').split(',');
     records.push({
-      zip,
-      lat:         coords.lat,
-      lng:         coords.lng,
-      city:        coords.city  || '',
-      state:       coords.state || '',
-      youth,
-      male15_17:   m15,
-      male18_19:   m18,
-      female15_17: f15,
-      female18_19: f18
+      fips,
+      lat:    center.lat,
+      lng:    center.lng,
+      county: nameParts[0]?.trim() || '',
+      state:  nameParts[1]?.trim() || '',
+      youth:  pop
     });
   }
 
   layers.census.data = records;
   document.getElementById('stat-census').textContent = `(${records.length.toLocaleString()})`;
-  console.log(`Census: ${raw.length - 1} ZCTAs from API, ${Object.keys(zipCoords).length} coords available, ${records.length} matched`);
+  console.log(`Census PEP: ${raw.length - 1} counties from API, ${records.length} matched to centroids`);
 }
 
 function renderCensus() {
   const data = layers.census.data;
   if (!data || !data.length) {
-    console.warn('Census: no data to render', layers.census);
+    console.warn('Census: no data to render');
     return;
   }
-  console.log(`Census: rendering ${data.length} ZIP records`);
 
   if (layers.census.heat && map.hasLayer(layers.census.heat)) {
     map.removeLayer(layers.census.heat);
   }
   layers.census.heat = null;
 
-  // Log scale so rural/suburban areas aren't invisible next to dense metros
   const logMax = Math.log1p(Math.max(...data.map(r => r.youth)));
 
   layers.census.heat = L.heatLayer(
     data.map(r => [r.lat, r.lng, Math.log1p(r.youth) / logMax]),
     {
-      radius: 12, blur: 15, maxZoom: 12, max: 1.0,
+      radius: 22, blur: 18, maxZoom: 12, max: 1.0,
       gradient: {
         0.0: 'rgba(0,0,0,0)',
         0.3: 'rgba(146,64,14,0.4)',
@@ -141,4 +93,21 @@ function renderCensus() {
   );
 
   if (layers.census.visible) showOnMap('census');
+}
+
+// ─── helpers ─────────────────────────────────────────────────────────────────
+
+function _geojsonCentroid(geometry) {
+  let ring;
+  if (geometry.type === 'Polygon') {
+    ring = geometry.coordinates[0];
+  } else if (geometry.type === 'MultiPolygon') {
+    // Use the largest polygon by vertex count
+    ring = geometry.coordinates.reduce((a, b) => a[0].length >= b[0].length ? a : b)[0];
+  } else {
+    return null;
+  }
+  const lat = ring.reduce((s, c) => s + c[1], 0) / ring.length;
+  const lng = ring.reduce((s, c) => s + c[0], 0) / ring.length;
+  return isValidCoord(lat, lng) ? { lat, lng } : null;
 }

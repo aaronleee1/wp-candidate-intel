@@ -1,7 +1,11 @@
-// ─── HIGH SCHOOLS LAYER (OpenStreetMap via Overpass API) ─────────────────────
+// ─── HIGH SCHOOLS LAYER (CDC PLACES — Physical Inactivity by ZIP) ────────────
+// Temporary replacement while Urban Institute Education Data API is down.
+// Uses CDC PLACES 2023 ZIP-level data, measureid=LPA (leisure-time physical inactivity).
 
-const NCES_CACHE_KEY = 'wp_intel_nces_v1';
-const NCES_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+const NCES_CACHE_KEY = 'wp_intel_nces_v3';
+const NCES_CACHE_TTL = 24 * 60 * 60 * 1000;
+
+const CDC_PLACES_URL = 'https://data.cdc.gov/resource/cwsq-ngmh.json';
 
 async function loadNCES() {
   try {
@@ -16,98 +20,66 @@ async function loadNCES() {
     }
   } catch {}
 
-  showLoading('Querying OpenStreetMap for US high schools...');
+  showLoading('Loading CDC PLACES health data...');
 
-  // Broaden the query to capture more high schools in OSM.
-  // Keep the main filters narrow, but also include common school labels and relation objects.
-  const bbox   = '(24,-125,50,-66)'; // continental US
-  const bboxAK = '(51,-180,72,-129)';
-  const bboxHI = '(18,-161,23,-154)';
-  const query = `[out:json][timeout:120];
-(
-  node["amenity"="school"]["school:level"~"secondary|high_school|high school|high",i]${bbox};
-  way["amenity"="school"]["school:level"~"secondary|high_school|high school|high",i]${bbox};
-  relation["amenity"="school"]["school:level"~"secondary|high_school|high school|high",i]${bbox};
-  node["amenity"="school"]["isced:level"~"3|4"]${bbox};
-  way["amenity"="school"]["isced:level"~"3|4"]${bbox};
-  relation["amenity"="school"]["isced:level"~"3|4"]${bbox};
-  node["amenity"="school"]["school:type"~"high|secondary",i]${bbox};
-  way["amenity"="school"]["school:type"~"high|secondary",i]${bbox};
-  relation["amenity"="school"]["school:type"~"high|secondary",i]${bbox};
-  node["amenity"="school"]["school:level"~"secondary|high_school|high school|high",i]${bboxAK};
-  way["amenity"="school"]["school:level"~"secondary|high_school|high school|high",i]${bboxAK};
-  relation["amenity"="school"]["school:level"~"secondary|high_school|high school|high",i]${bboxAK};
-  node["amenity"="school"]["school:level"~"secondary|high_school|high school|high",i]${bboxHI};
-  way["amenity"="school"]["school:level"~"secondary|high_school|high school|high",i]${bboxHI};
-  relation["amenity"="school"]["school:level"~"secondary|high_school|high school|high",i]${bboxHI};
-);
-out center tags;`;
+  const params = new URLSearchParams({
+    measureid: 'LPA',
+    '$select': 'locationid,locationname,data_value,geolocation',
+    '$limit':  '50000',
+    '$offset': '0'
+  });
 
-  const postOpts = {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body:    'data=' + encodeURIComponent(query)
-  };
-
-  let res = null;
-  const mirrors = [
-    OVERPASS_API,
-    'https://overpass.kumi.systems/api/interpreter',
-    'https://overpass.openstreetmap.ru/api/interpreter'
-  ];
-  for (const url of mirrors) {
-    updateLoading(`Querying OpenStreetMap${url !== OVERPASS_API ? ' (mirror)' : ''}...`);
-    try {
-      res = await fetchWithTimeout(url, 60000, postOpts);
-      if (res.ok) break;
-      console.warn(`Overpass ${url} → HTTP ${res.status}`);
-      res = null;
-    } catch (e) {
-      console.warn(`Overpass ${url} → ${e.message}`);
-      res = null;
-    }
+  let res;
+  const url = `${CDC_PLACES_URL}?${params}`;
+  try {
+    res = await fetchWithTimeout(url, 60000);
+  } catch (e) {
+    throw new Error(`CDC PLACES request failed: ${e.message}`);
   }
-  if (!res || !res.ok) throw new Error('Could not reach the Overpass API. Check your internet connection.');
+  if (!res.ok) throw new Error(`CDC PLACES API returned HTTP ${res.status}`);
 
-  updateLoading('Parsing high school data...');
+  updateLoading('Parsing CDC PLACES data...');
   const data = await res.json();
 
-  const seen    = new Set();
   const schools = [];
+  for (const r of data) {
+    const geo = r.geolocation;
+    if (!geo) continue;
 
-  for (const el of (data.elements || [])) {
-    if (seen.has(el.id)) { continue; } seen.add(el.id);
+    // Socrata returns Point as {latitude, longitude} strings or GeoJSON {coordinates:[lng,lat]}
+    let lat, lng;
+    if (geo.latitude !== undefined) {
+      lat = parseFloat(geo.latitude);
+      lng = parseFloat(geo.longitude);
+    } else if (geo.coordinates) {
+      lng = parseFloat(geo.coordinates[0]);
+      lat = parseFloat(geo.coordinates[1]);
+    } else continue;
 
-    const lat = parseFloat(el.type === 'node' ? el.lat : el.center?.lat);
-    const lng = parseFloat(el.type === 'node' ? el.lon : el.center?.lon);
     if (!isValidCoord(lat, lng)) continue;
 
-    const t   = el.tags || {};
-    const zip = normalizeZip(t['addr:postcode'] || '');
-
     schools.push({
-      id:       el.id,
-      name:     t.name || 'Unknown School',
+      id:             r.locationid,
+      name:           `ZIP ${r.locationid}`,
       lat, lng,
-      zip,
-      city:     t['addr:city']  || t['addr:town'] || t['addr:hamlet'] || '',
-      state:    osmState(t['addr:state'] || ''),
-      street:   [t['addr:housenumber'], t['addr:street']].filter(Boolean).join(' '),
-      phone:    t.phone         || t['contact:phone']   || '',
-      website:  t.website       || t['contact:website'] || t.url || '',
-      operator: t.operator      || t['school:authority'] || '',
-      // fields kept for gap/sidebar compatibility
+      zip:            normalizeZip(r.locationid || ''),
+      city:           r.locationname || '',
+      state:          '',
+      street:         '',
+      phone:          '',
+      website:        '',
+      operator:       '',
       enrollment:     0,
       teachers:       0,
-      district:       t.operator || '',
-      type:           osmSchoolType(t),
+      district:       '',
+      type:           'Public',
       locale:         '',
       titleIEligible: false,
       magnet:         false,
-      charter:        (t['school:type'] || '').toLowerCase().includes('charter'),
+      charter:        false,
       virtual:        false,
       bie:            false,
-      freeLunch:      0,
+      freeLunch:      parseFloat(r.data_value) || 0,
       congressDist:   '',
       stateLegLower:  '',
       stateLegUpper:  '',
@@ -122,36 +94,6 @@ out center tags;`;
 
   layers.nces.data = schools;
   document.getElementById('stat-nces').textContent = `(${schools.length.toLocaleString()})`;
-}
-
-// ─── helpers ─────────────────────────────────────────────────────────────────
-
-function osmSchoolType(tags) {
-  const op = (tags['operator:type'] || '').toLowerCase();
-  const st = (tags['school:type']   || '').toLowerCase();
-  if (st.includes('charter'))  return 'Charter';
-  if (op === 'private')        return 'Private';
-  return 'Public';
-}
-
-function osmState(raw) {
-  if (!raw) return '';
-  const s = raw.trim();
-  if (s.length === 2) return s.toUpperCase();
-  const map = {
-    'Alabama':'AL','Alaska':'AK','Arizona':'AZ','Arkansas':'AR','California':'CA',
-    'Colorado':'CO','Connecticut':'CT','Delaware':'DE','Florida':'FL','Georgia':'GA',
-    'Hawaii':'HI','Idaho':'ID','Illinois':'IL','Indiana':'IN','Iowa':'IA','Kansas':'KS',
-    'Kentucky':'KY','Louisiana':'LA','Maine':'ME','Maryland':'MD','Massachusetts':'MA',
-    'Michigan':'MI','Minnesota':'MN','Mississippi':'MS','Missouri':'MO','Montana':'MT',
-    'Nebraska':'NE','Nevada':'NV','New Hampshire':'NH','New Jersey':'NJ',
-    'New Mexico':'NM','New York':'NY','North Carolina':'NC','North Dakota':'ND',
-    'Ohio':'OH','Oklahoma':'OK','Oregon':'OR','Pennsylvania':'PA','Rhode Island':'RI',
-    'South Carolina':'SC','South Dakota':'SD','Tennessee':'TN','Texas':'TX','Utah':'UT',
-    'Vermont':'VT','Virginia':'VA','Washington':'WA','West Virginia':'WV',
-    'Wisconsin':'WI','Wyoming':'WY','District of Columbia':'DC'
-  };
-  return map[s] || s.substring(0, 2).toUpperCase();
 }
 
 function ncesLocale(code) {

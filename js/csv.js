@@ -1,10 +1,33 @@
 // ─── CSV LAYER (WEST POINT APPLICANTS) ───────────────────────────────────────
 
+function splitCSVRow(line) {
+  const fields = [];
+  let i = 0;
+  while (i <= line.length) {
+    if (line[i] === '"') {
+      let j = i + 1, val = '';
+      while (j < line.length) {
+        if (line[j] === '"' && line[j + 1] === '"') { val += '"'; j += 2; }
+        else if (line[j] === '"') { j++; break; }
+        else { val += line[j++]; }
+      }
+      fields.push(val);
+      i = j + 1;
+    } else {
+      const end = line.indexOf(',', i);
+      const j = end === -1 ? line.length : end;
+      fields.push(line.slice(i, j));
+      i = j + 1;
+    }
+  }
+  return fields;
+}
+
 function parseCSV(text) {
   const lines = text.trim().split('\n');
 
   // Detect column positions from header row
-  const hdrs = lines[0].split(',').map(h => h.trim().replace(/"/g, '').toLowerCase());
+  const hdrs = splitCSVRow(lines[0]).map(h => h.trim().toLowerCase());
   const ci = key => hdrs.findIndex(h => h.includes(key));
 
   const STATUS_COL    = ci('person status');
@@ -20,7 +43,7 @@ function parseCSV(text) {
   const zipData = {};
 
   for (let i = 1; i < lines.length; i++) {
-    const cols = lines[i].split(',');
+    const cols = splitCSVRow(lines[i]);
     const zip  = ZIP_COL >= 0 && cols[ZIP_COL] ? cols[ZIP_COL].trim().replace(/"/g, '') : '';
     if (!zip || !/^\d{5}$/.test(zip)) continue;
     if (!zipData[zip]) zipData[zip] = { count: 0, rows: [] };

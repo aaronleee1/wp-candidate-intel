@@ -184,6 +184,10 @@
     if (cfg.source.dataPath) {
       raw = cfg.source.dataPath.split('.').reduce((o, k) => o && o[k], raw);
     }
+    // ArcGIS REST: unwrap features[].attributes so field names are top-level
+    if (Array.isArray(raw) && raw[0]?.attributes && typeof raw[0].attributes === 'object') {
+      raw = raw.map(f => f.attributes);
+    }
     if (!Array.isArray(raw)) {
       throw new Error(
         `API did not return an array of records.\n` +
@@ -202,6 +206,16 @@
         const lng = parseFloat(rec[lngField]);
         if (isValidCoord(lat, lng)) points.push({ lat, lng, _rec: rec });
       });
+      if (points.length === 0 && raw.length > 0) {
+        const sample = raw[0];
+        const available = Object.keys(sample).join(', ');
+        const gotLat = sample[latField], gotLng = sample[lngField];
+        throw new Error(
+          `No valid coordinates found.\n` +
+          `Lat field "${latField}" = ${JSON.stringify(gotLat)}, Lng field "${lngField}" = ${JSON.stringify(gotLng)}.\n` +
+          `Available fields: ${available}`
+        );
+      }
 
     } else if (cfg.location.type === 'zip') {
       const { zipField } = cfg.location;
@@ -510,10 +524,9 @@
         chip.type = 'button'; chip.className = 'al-chip'; chip.textContent = k;
         chip.title = `Sample value: ${JSON.stringify(first[k]).slice(0, 60)}`;
         chip.onclick = () => {
-          if (_lastFieldInput) {
-            _lastFieldInput.value = k;
-            _lastFieldInput.focus();
-          }
+          const label = k.replace(/[_\-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+          const fIn = _addPopupRow(label, k);
+          fIn.focus();
         };
         chips.appendChild(chip);
       });
