@@ -63,15 +63,13 @@ function renderGapMapFromControls() {
   const markers = topZips.map(z => {
     const isBlind = z.wpCount === 0;
     const color   = isBlind ? '#be7966' : '#8876c9';
-    const ratio   = z.baseGap < 999 ? Math.min(z.baseGap / maxScore, 1) : 1;
-    const radius  = isBlind ? 5 : 3 + Math.round(ratio * 3);
 
     const m = L.circleMarker([z.lat, z.lng], {
-      radius,
+      radius: 4,
       color,
       fillColor: color,
-      fillOpacity: 0.9,
-      weight: 2
+      fillOpacity: 0.8,
+      weight: 1
     });
 
     const scoreLabel = z.baseGap < 999 ? z.baseGap.toFixed(1) : '999+';

@@ -143,17 +143,14 @@ function renderNCES() {
   if (layers.nces.heat && map.hasLayer(layers.nces.heat)) map.removeLayer(layers.nces.heat);
   layers.nces.heat = null;
 
-  // Weight heatmap by physical inactivity rate — higher = more intense dot
-  const maxLPA = Math.max(...schools.map(s => s.health?.LPA || 0));
-
   layers.nces.heat = L.heatLayer(
-    schools.map(s => [s.lat, s.lng, maxLPA ? (s.health?.LPA || 0) / maxLPA : 0.6]),
-    { radius: 10, blur: 12, maxZoom: 12,
+    schools.map(s => [s.lat, s.lng, 0.6]),
+    { radius: 11, blur: 13, maxZoom: 12,
       gradient: {
         0.0: 'rgba(0,0,0,0)',
-        0.4: 'rgba(24,100,171,0.2)',
-        0.7: 'rgba(77,171,247,0.3)',
-        1.0: 'rgba(165,243,252,0.4)'
+        0.3: 'rgba(30,120,210,0.45)',
+        0.6: 'rgba(77,171,247,0.7)',
+        1.0: 'rgba(186,230,253,0.9)'
       }
     }
   );

@@ -115,7 +115,7 @@ function renderCSV() {
   }
 
   layers.csv.heat = L.heatLayer(heatPts, {
-    radius: 18, blur: 12, maxZoom: 10, max: 1.0,
+    radius: 14, blur: 12, maxZoom: 10, max: 1.0,
     gradient: {
       0.0:  'rgba(0,0,0,0)',
       0.3:  'rgba(124,45,18,0.45)',
