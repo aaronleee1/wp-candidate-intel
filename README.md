@@ -111,18 +111,78 @@ The recruiter can filter results to a specific region or congressional district 
 
 ## How to Use the Tool
 
-### 1. Open the Application
+### Setup (First Time Only)
 
-Open `index.html` in any modern web browser (Chrome, Firefox, Edge, or Safari). For best results, serve the folder through a local web server rather than opening the file directly:
+#### Step 1: Install Git
+
+Git is a tool that downloads the project files to your computer.
+
+**On Mac:**
+1. Visit https://git-scm.com/download/mac
+2. Download the installer and run it
+3. Follow the installation steps
+
+**On Windows:**
+1. Visit https://git-scm.com/download/win
+2. Download the installer and run it
+3. Follow the installation steps (accept all default options)
+
+#### Step 2: Install VS Code (Optional but Recommended)
+
+VS Code is a text editor that makes it easy to view and work with the project files. You don't *need* it, but it's helpful.
+
+1. Visit https://code.visualstudio.com
+2. Click the download button for your computer (Mac or Windows)
+3. Run the installer and follow the steps
+
+#### Step 3: Download the Project
+
+Open your terminal or command prompt and run this command:
+
+**Mac:** Open Spotlight (Cmd+Space), type "Terminal", and press Enter
+
+**Windows:** Press the Windows key, type "Command Prompt" or "PowerShell", and press Enter
+
+Then copy and paste this entire command and press Enter:
 
 ```bash
-# Run from the MVP1 directory
+git clone https://github.com/your-username/wp-candidate-intel.git
+cd wp-candidate-intel
+```
+
+This downloads all the project files to your computer.
+
+#### Step 4: Start the Web Server
+
+The app runs in your web browser. To do that, we need to start a simple web server.
+
+While still in the terminal, copy and paste this command and press Enter:
+
+```bash
 python3 -m http.server 8000
 ```
 
-Then navigate to `http://localhost:8000` in the browser.
+You should see a message that looks like:
+```
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+```
 
-### 2. Load Data Layers
+This means the server is running. **Leave this terminal window open** — don't close it.
+
+#### Step 5: Open the App in Your Browser
+
+1. Open your web browser (Chrome, Firefox, Safari, or Edge)
+2. Type this into the address bar and press Enter:
+   ```
+   http://localhost:8000
+   ```
+3. You should see a map. The app is now running!
+
+---
+
+### Using the Tool (Once Setup is Complete)
+
+#### 1. Load Data Layers
 
 Click the layer buttons in the top navigation bar to load each dataset. Layers can be toggled on or off independently. The High Schools, JROTC, and BSA layers load automatically on startup.
 
@@ -134,7 +194,7 @@ Click the layer buttons in the top navigation bar to load each dataset. Layers c
 | **WP Applicants** | Historical applicant heatmap from uploaded CSV (amber/orange) |
 | **Gap Analysis** | Scored recruiting gap map (purple/red, requires CSV) |
 
-### 3. Upload the West Point Applicant CSV
+#### 2. Upload the West Point Applicant CSV
 
 Click **Upload CSV** within the WP Applicants button and select the applicant data file. The tool expects the following columns (matched case-insensitively):
 
@@ -148,11 +208,11 @@ Click **Upload CSV** within the WP Applicants button and select the applicant da
 | `state district` | State legislative district |
 | `sport 1`, `sport 2`, … | Athletic participation (any column containing "sport") |
 
-### 4. Enable Gap Analysis
+#### 3. Enable Gap Analysis
 
 Once the applicant CSV is loaded, click **Gap Analysis**. The map will display scored ZIP codes as circles — larger and redder circles represent higher-priority recruiting targets.
 
-### 5. Review the Gap List
+#### 4. Review the Gap List
 
 Click the **GAP LIST** tab on the left edge of the map to open the ranked panel. This panel lists the top-scoring ZIP codes per region in priority order, showing the city, state, ZIP code, gap classification, pipeline signals present, and applicant count.
 
@@ -162,9 +222,15 @@ Use the filter controls to narrow results:
 - **District** — restrict to a specific congressional district
 - **Top N per region** — adjust how many ZIPs per region are shown (default: 20)
 
-### 6. Inspect a Location
+#### 5. Inspect a Location
 
 Click any dot on the map or any entry in the Gap List to open the detail sidebar. The sidebar provides a full breakdown of all available data for that ZIP code, including school names and enrollment figures, JROTC program details, BSA council information, WP applicant statistics, and the computed gap score.
+
+---
+
+### Stopping the App
+
+When you're done using the app, go back to the terminal window (the one running the web server) and press **Ctrl+C** (on both Mac and Windows). This stops the server. The next time you want to use the app, just repeat Step 4 above.
 
 ---
 
