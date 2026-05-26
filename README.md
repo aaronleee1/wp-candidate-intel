@@ -208,6 +208,8 @@ Click **Upload CSV** within the WP Applicants button and select the applicant da
 | `state district` | State legislative district |
 | `sport 1`, `sport 2`, … | Athletic participation (any column containing "sport") |
 
+**Don't have your own data yet?** Download this [sample CSV file](https://docs.google.com/spreadsheets/d/1w4xO-px8cY67mnueNFs37diY4uh04QwT/edit?usp=drive_link&ouid=110601371280485910617&rtpof=true&sd=true) to test the tool. Open it in Google Sheets or Excel, download it as a CSV file, and upload it to the tool to see how the gap analysis works.
+
 #### 3. Enable Gap Analysis
 
 Once the applicant CSV is loaded, click **Gap Analysis**. The map will display scored ZIP codes as circles — larger and redder circles represent higher-priority recruiting targets.
