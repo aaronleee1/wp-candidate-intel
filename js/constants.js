@@ -9,7 +9,8 @@ const ZIP_API     = 'https://api.zippopotam.us/us';
 const LOCAL_JROTC_FILE = 'data/jrotc.xlsx';
 const LOCAL_BSA_FILE   = 'data/bsa-councils.json';
 const LOCAL_COUNTIES_FILE = 'data/us-counties.geojson';
-const FCC_COUNTY_API = 'https://geo.fcc.gov/api/census/area';
+const FCC_COUNTY_API  = 'https://geo.fcc.gov/api/census/area';
+const CENSUS_ACS_API  = 'https://api.census.gov/data/2023/acs/acs5';
 
 // ~130 well-distributed zip codes to seed BSA council discovery
 // WP Admissions Regions by state abbreviation.

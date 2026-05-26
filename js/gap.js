@@ -63,20 +63,18 @@ function renderGapMapFromControls() {
   const markers = topZips.map(z => {
     const isBlind = z.wpCount === 0;
     const color   = isBlind ? '#be7966' : '#8876c9';
-    const ratio   = z.baseGap < 999 ? Math.min(z.baseGap / maxScore, 1) : 1;
-    const radius  = isBlind ? 5 : 3 + Math.round(ratio * 3);
 
     const m = L.circleMarker([z.lat, z.lng], {
-      radius,
+      radius: 4,
       color,
       fillColor: color,
-      fillOpacity: 0.9,
-      weight: 2
+      fillOpacity: 0.8,
+      weight: 1
     });
 
     const scoreLabel = z.baseGap < 999 ? z.baseGap.toFixed(1) : '999+';
     m.bindTooltip(
-      `<b>${z.city}, ${z.state}</b> (${z.zip})<br>` +
+      `<b>${z.city}, ${z.state}</b><br>` +
       `${isBlind ? '⚠ Not on radar' : 'Underrepresented'} · Score: ${scoreLabel}<br>` +
       `${z.wpCount} WP records`,
       { sticky: true }
@@ -101,12 +99,12 @@ function computeAndRenderGap() {
   const ncesData = layers.nces.data;
   if (!csvData) return;
 
-  // Build zip → centroid from OSM school locations
+  // Build zip → centroid + health data from NCES/CDC layer
   const ncesZip = {};
   if (ncesData) {
     for (const s of ncesData) {
       if (!s.zip) continue;
-      if (!ncesZip[s.zip]) ncesZip[s.zip] = { lat: 0, lng: 0, n: 0, city: s.city, state: s.state };
+      if (!ncesZip[s.zip]) ncesZip[s.zip] = { lat: 0, lng: 0, n: 0, city: s.city, state: s.state, health: s.health || {} };
       ncesZip[s.zip].lat += s.lat;
       ncesZip[s.zip].lng += s.lng;
       ncesZip[s.zip].n++;
@@ -114,7 +112,14 @@ function computeAndRenderGap() {
     for (const z of Object.values(ncesZip)) { z.lat /= z.n; z.lng /= z.n; }
   }
 
-  // Build zip → JROTC count
+  // Enrich city/state from geocode cache (CDC locationname is just the ZIP code)
+  const geoCache = loadZipCache();
+  for (const [zip, z] of Object.entries(ncesZip)) {
+    const g = geoCache[zip];
+    if (g?.city) { z.city = g.city; z.state = g.state || z.state; }
+  }
+
+  // Build zip → JROTC city lookup (geocoded real names)
   const jrotcZip = {};
   if (layers.jrotc.data) {
     for (const s of layers.jrotc.data) {
@@ -150,6 +155,11 @@ function computeAndRenderGap() {
     let lat, lng, city, state;
     if (nces) {
       lat = nces.lat; lng = nces.lng; city = nces.city; state = nces.state;
+      // Prefer JROTC's geocoded city if NCES city still looks like a ZIP
+      if (jrotcCount && layers.jrotc.data) {
+        const js = layers.jrotc.data.find(s => s.zip === zip);
+        if (js?.city && /^\d{5}$/.test(city)) { city = js.city; state = js.state || state; }
+      }
     } else if (jrotcCount && layers.jrotc.data) {
       const s = layers.jrotc.data.find(s => s.zip === zip);
       if (!s || !s.lat) continue;
@@ -169,12 +179,21 @@ function computeAndRenderGap() {
     if (jrotcCount >= 3) multiplier *= 1.2;
     if (hasBSA)          multiplier *= 1.2;
 
+    // Health multiplier — lower inactivity/obesity = more physically eligible candidates
+    // National averages: LPA ~25%, OBESITY ~31%
+    const health = nces?.health || {};
+    let healthMult = 1.0;
+    if (health.LPA     != null) healthMult *= Math.max(0.75, Math.min(1.25, 1 + (25 - health.LPA)     / 100));
+    if (health.OBESITY != null) healthMult *= Math.max(0.85, Math.min(1.15, 1 + (31 - health.OBESITY) / 100));
+    healthMult = Math.max(0.6, Math.min(1.4, healthMult));
+    multiplier *= healthMult;
+
     // Athletic gap
     let athleticMod = 0;
     if (wpEntry && wpEntry.rows.length > 0) {
       const withSports = wpEntry.rows.filter(r => r.sports && r.sports.length > 0).length;
       const sportPct   = withSports / wpEntry.rows.length;
-      if (sportPct === 0)     athleticMod = 2;
+      if (sportPct === 0)      athleticMod = 2;
       else if (sportPct < 0.1) athleticMod = 1;
     } else {
       athleticMod = 2;
@@ -185,8 +204,8 @@ function computeAndRenderGap() {
       ? 999 + multiplier * 10 + athleticMod * 5
       : (multiplier + athleticMod) / repRatio;
 
-    const wpRegion    = WP_REGIONS[state] || 'Other';
-    scored.push({ zip, lat, lng, city, state, baseGap, wpCount, jrotcCount, hasBSA, athleticMod, multiplier, wpRegion });
+    const wpRegion = WP_REGIONS[state] || 'Other';
+    scored.push({ zip, lat, lng, city, state, baseGap, wpCount, jrotcCount, hasBSA, athleticMod, multiplier, healthMult, health, wpRegion });
   }
 
   scored.sort((a, b) => b.baseGap - a.baseGap);

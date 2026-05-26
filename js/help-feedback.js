@@ -10,61 +10,61 @@ const FEEDBACK_EMAIL = '';   // e.g. 'recruiter@westpoint.edu' — leave blank t
 
 const HELP_STEPS = [
   {
-    title: 'Welcome',
+    title: 'Overview',
     content: `
-      <h2>Welcome to West Point Candidate Intelligence</h2>
-      <p>This tool helps you identify high-potential recruiting areas across the United States by overlaying multiple data sources on an interactive map.</p>
-      <p>Use the layer buttons in the toolbar to load data, upload your applicant CSV, then run Gap Analysis to find ZIP codes that are underrepresented in West Point's pipeline.</p>
-      <div class="help-tip">Use the numbered sections on the left to jump to any topic.</div>
+      <h2>West Point Candidate Intelligence</h2>
+      <p>This platform supports U.S. Military Academy recruiting efforts by aggregating and visualizing multiple public data sources on an interactive national map. It is designed to help recruiters identify geographic areas with high candidate potential that are currently underrepresented in the West Point applicant pipeline.</p>
+      <p>Data layers are loaded on demand, applicant records are processed locally in the browser, and Gap Analysis is computed in real time from the active datasets.</p>
+      <div class="help-tip">Use the numbered sections in the left navigation to access any topic directly.</div>
     `,
   },
   {
     title: 'Data Sources',
     content: `
-      <h2>Where the Data Comes From</h2>
-      <p>Every layer pulls from a live, public data source — no data is stored on a private server.</p>
+      <h2>Data Sources</h2>
+      <p>All layers are sourced from publicly available APIs and datasets. No data is transmitted to or stored on a private server.</p>
 
       <div class="help-source-block">
-        <div class="help-source-name" style="color:#4dabf7">&#9632; High Schools</div>
+        <div class="help-source-name" style="color:#4dabf7">&#9632; Health Data</div>
         <div class="help-source-detail">
-          <b>Source:</b> <a href="https://www.openstreetmap.org" target="_blank" rel="noopener" style="color:#4dabf7">OpenStreetMap</a> via the Overpass API<br>
-          <b>Currency:</b> Continuously updated by a global community of contributors<br>
-          <b>Coverage:</b> US schools tagged as secondary-level — includes name, address, phone, and website where contributors have added them<br>
-          <b>Limitation:</b> Coverage varies; schools not yet tagged in OSM will not appear
+          <b>Source:</b> CDC PLACES — ZIP Code Tabulation Area (ZCTA) level health estimates<br>
+          <b>Currency:</b> Most recent CDC PLACES release (~30,000 ZIP codes nationwide)<br>
+          <b>Coverage:</b> Community health indicators including physical inactivity, obesity, smoking prevalence, diabetes, blood pressure, mental health, and insurance coverage<br>
+          <b>Use:</b> Identifies communities with health profiles favorable to physically demanding service; incorporated into Gap Analysis scoring
         </div>
       </div>
 
       <div class="help-source-block">
         <div class="help-source-name" style="color:#51cf66">&#9632; JROTC Programs</div>
         <div class="help-source-detail">
-          <b>Source:</b> U.S. Army JROTC (<a href="https://usarmyjrotc.army.mil" target="_blank" rel="noopener" style="color:#51cf66">usarmyjrotc.army.mil</a>)<br>
-          <b>Currency:</b> April 2024 official program roster (bundled spreadsheet)<br>
-          <b>Coverage:</b> All active Army JROTC programs with school name, ZIP, brigade, and program type
+          <b>Source:</b> U.S. Army JROTC official program roster (<a href="https://usarmyjrotc.army.mil" target="_blank" rel="noopener" style="color:#51cf66">usarmyjrotc.army.mil</a>)<br>
+          <b>Currency:</b> April 2024 roster (bundled spreadsheet)<br>
+          <b>Coverage:</b> All active Army JROTC programs, including school name, ZIP code, brigade assignment, and program type
         </div>
       </div>
 
       <div class="help-source-block">
         <div class="help-source-name" style="color:#ffa94d">&#9632; BSA Councils</div>
         <div class="help-source-detail">
-          <b>Source:</b> Boy Scouts of America (<a href="https://www.scouting.org" target="_blank" rel="noopener" style="color:#ffa94d">api.scouting.org</a>)<br>
-          <b>Currency:</b> Live API — reflects current council locations<br>
-          <b>Coverage:</b> All BSA council headquarters discovered by probing ZIP codes nationwide
+          <b>Source:</b> Boy Scouts of America public API (<a href="https://www.scouting.org" target="_blank" rel="noopener" style="color:#ffa94d">api.scouting.org</a>)<br>
+          <b>Currency:</b> Live — reflects current council headquarters locations<br>
+          <b>Coverage:</b> All BSA council headquarters across the United States
         </div>
       </div>
 
       <div class="help-source-block">
         <div class="help-source-name" style="color:#c0828d">&#9632; WP Applicants</div>
         <div class="help-source-detail">
-          <b>Source:</b> Your uploaded CSV file<br>
-          <b>Privacy:</b> Processed entirely in your browser — never sent to any external server
+          <b>Source:</b> Recruiter-uploaded CSV file<br>
+          <b>Privacy:</b> All processing occurs locally within the browser session; no applicant data is transmitted externally
         </div>
       </div>
 
       <div class="help-source-block">
         <div class="help-source-name" style="color:#8876c9">&#9632; Gap Analysis</div>
         <div class="help-source-detail">
-          <b>Source:</b> Computed locally from the layers above — no external API<br>
-          <b>Method:</b> Scores ZIP codes by WP representation relative to pipeline signals (JROTC/BSA presence)
+          <b>Source:</b> Derived locally from the active data layers — no external computation<br>
+          <b>Method:</b> Scores ZIP codes by representation deficit relative to pipeline strength and community health indicators
         </div>
       </div>
     `,
@@ -73,93 +73,111 @@ const HELP_STEPS = [
     title: 'Loading Data Layers',
     content: `
       <h2>Loading Data Layers</h2>
-      <p>The toolbar at the top shows all available data layers. Click any button to load and display that layer on the map.</p>
+      <p>All available data layers are accessible from the toolbar at the top of the map. Each layer is loaded independently and can be toggled without reloading the underlying data.</p>
       <ul class="help-steps-list">
-        <li><span class="step-n">1</span><span>Click a layer button — it will pulse while loading.</span></li>
-        <li><span class="step-n">2</span><span>Once loaded, the button stays highlighted and the record count appears next to it.</span></li>
-        <li><span class="step-n">3</span><span>Click the button again to hide that layer without losing the data.</span></li>
+        <li><span class="step-n">1</span><span>Select a layer button — the button will animate while data is being retrieved.</span></li>
+        <li><span class="step-n">2</span><span>Once loaded, the button remains highlighted and the record count is displayed alongside it.</span></li>
+        <li><span class="step-n">3</span><span>Click the button again to hide the layer from the map without discarding the data.</span></li>
       </ul>
-      <p><span class="help-tag">High Schools</span> — US high schools from OpenStreetMap. Shown as a blue heatmap. Includes phone and website links in the info panel where available.</p>
-      <p><span class="help-tag">JROTC</span> — Army JROTC program locations. Shown as sage-green dots.</p>
-      <p><span class="help-tag">BSA Councils</span> — Boy Scouts of America council headquarters. Shown as tan dots.</p>
-      <div class="help-tip">High Schools loads from OpenStreetMap and may take 15–60 seconds. All other layers load in a few seconds. Data is not cached between sessions.</div>
+      <p><span class="help-tag">Health Data</span> — CDC PLACES health estimates by ZIP code, displayed as a blue density heatmap. Health metrics are visible in the info panel for each area.</p>
+      <p><span class="help-tag">JROTC</span> — Army JROTC program locations, displayed as sage-green markers.</p>
+      <p><span class="help-tag">BSA Councils</span> — Boy Scouts of America council headquarters, displayed as tan markers.</p>
+      <div class="help-tip">Health Data geocodes ZIP codes on first load, which may take several minutes for uncached ZIPs. All results are cached locally for 24 hours.</div>
     `,
   },
   {
     title: 'Uploading WP Applicants',
     content: `
-      <h2>Uploading Your WP Applicants CSV</h2>
-      <p>To unlock Gap Analysis, you need to upload your West Point applicant data as a CSV file.</p>
+      <h2>Uploading Applicant Data</h2>
+      <p>Gap Analysis requires a West Point applicant dataset uploaded as a CSV file. This file is processed entirely within the browser and is never transmitted to an external server.</p>
       <ul class="help-steps-list">
         <li><span class="step-n">1</span><span>Click the <span class="help-tag">WP Applicants</span> button in the toolbar.</span></li>
-        <li><span class="step-n">2</span><span>Click <b>Upload CSV</b> and select your file.</span></li>
-        <li><span class="step-n">3</span><span>The tool auto-detects columns for ZIP code, name, status, submitted, offered, sports, and more.</span></li>
-        <li><span class="step-n">4</span><span>An orange heatmap will appear showing applicant density by ZIP code.</span></li>
+        <li><span class="step-n">2</span><span>Select <b>Upload CSV</b> and choose the appropriate file.</span></li>
+        <li><span class="step-n">3</span><span>Column headers are detected automatically. Recognized fields include ZIP code, applicant status, submission status, offer status, and athletic data.</span></li>
+        <li><span class="step-n">4</span><span>An orange heatmap will render on the map reflecting applicant density by ZIP code.</span></li>
       </ul>
-      <div class="help-tip">Your CSV file is processed entirely in your browser — no data is uploaded to any server.</div>
-      <p>Expected columns include: <code style="color:#fb923c">zip</code>, <code style="color:#fb923c">status</code>, <code style="color:#fb923c">submitted</code>, <code style="color:#fb923c">offered</code>. Column names are matched flexibly.</p>
+      <div class="help-tip">Applicant data is processed locally and is not retained between sessions unless cached explicitly.</div>
+      <p>Supported column headers include: <code style="color:#fb923c">zip</code>, <code style="color:#fb923c">status</code>, <code style="color:#fb923c">submitted</code>, <code style="color:#fb923c">offered</code>. Column names are matched with flexible pattern recognition.</p>
     `,
   },
   {
     title: 'Gap Analysis',
     content: `
-      <h2>Running Gap Analysis</h2>
-      <p>Gap Analysis finds ZIP codes with high candidate potential that are underrepresented in your applicant pipeline.</p>
+      <h2>Gap Analysis</h2>
+      <p>Gap Analysis identifies ZIP codes where West Point's recruiting pipeline is absent or proportionally underrepresented relative to the area's candidate potential.</p>
       <ul class="help-steps-list">
-        <li><span class="step-n">1</span><span>Load at least one of: High Schools, JROTC, or BSA Councils.</span></li>
+        <li><span class="step-n">1</span><span>Ensure at least one pipeline layer is active: Health Data, JROTC, or BSA Councils.</span></li>
         <li><span class="step-n">2</span><span>Upload your WP Applicants CSV.</span></li>
-        <li><span class="step-n">3</span><span>Click <span class="help-tag">Gap Analysis</span> — a purple heatmap appears.</span></li>
+        <li><span class="step-n">3</span><span>Activate <span class="help-tag">Gap Analysis</span> — a purple heatmap will render over priority areas.</span></li>
       </ul>
-      <p>ZIP codes are scored by combining pipeline signals (JROTC/BSA presence) and WP representation. Two types of gaps are identified:</p>
-      <p><span style="color:#ff3333;font-weight:600">Not on Radar</span> — ZIP codes with zero WP records but significant pipeline signals.</p>
-      <p><span style="color:#cc66ff;font-weight:600">Underrepresented</span> — ZIP codes with some WP records but fewer than expected given their pipeline signals.</p>
-      <div class="help-tip">Open the <b>GAP LIST</b> tab on the left edge of the map to see a ranked list of top gap areas filtered by region.</div>
+
+      <p>Two classifications are applied:</p>
+      <p><span style="color:#ff3333;font-weight:600">Not on Radar</span> — Areas with zero WP applicant records despite measurable pipeline indicators.</p>
+      <p><span style="color:#cc66ff;font-weight:600">Underrepresented</span> — Areas with some WP records, but fewer than expected given their pipeline strength.</p>
+
+      <h2 style="margin-top:14px">Scoring Methodology</h2>
+
+      <p><b>Unrepresented ZIP</b> (zero WP records):</p>
+      <p><code style="color:#c084fc">Score = 999 + (M × 10) + (A × 5)</code></p>
+
+      <p style="margin-top:10px"><b>Underrepresented ZIP</b> (some WP records):</p>
+      <p><code style="color:#c084fc">Score = (M + A) / (wpCount / 0.5)</code></p>
+
+      <p style="margin-top:12px"><b>M — Composite Multiplier</b> = pipeline multiplier × health multiplier</p>
+      <p>Pipeline multiplier starts at 1.0. JROTC presence adds ×1.5; three or more JROTC programs add a further ×1.2; a BSA Council adds ×1.2. The health multiplier is derived from CDC PLACES data — physical inactivity deviation from the 25% national average contributes ±0.25, obesity deviation from 31% contributes ±0.15. The combined health factor is clamped to [0.6, 1.4].</p>
+
+      <p style="margin-top:10px"><b>A — Athletic Modifier</b></p>
+      <p>+2 if no existing applicants have sports data; +1 if fewer than 10% do; +0 otherwise. Reflects the likelihood of athletically competitive candidates in areas with no prior athletic signal.</p>
+
+      <p style="margin-top:10px"><b>Representation ratio</b> = wpCount ÷ 0.5, normalized against an assumed 500-student cohort baseline per ZIP.</p>
+
+      <div class="help-tip">Open the <b>GAP LIST</b> panel on the left edge of the map to view a ranked list of priority areas, filterable by status and WP admissions region.</div>
     `,
   },
   {
-    title: 'The Info Panel',
+    title: 'Info Panel',
     content: `
-      <h2>Reading the Info Panel</h2>
-      <p>Click any dot or heatmap area on the map to open the info panel on the right side. It shows all available data for that ZIP code.</p>
-      <p>Depending on which layers are active, you will see sections for:</p>
+      <h2>Info Panel</h2>
+      <p>Selecting any marker or heatmap region on the map opens the Info Panel on the right side of the screen. The panel displays all available data for the selected ZIP code, organized by active layer.</p>
+      <p>Sections displayed depend on which layers are currently active:</p>
       <ul class="help-steps-list">
-        <li><span class="step-n">&#9632;</span><span><b>High Schools</b> — school names, addresses, phone numbers, and website links (where available in OpenStreetMap).</span></li>
-        <li><span class="step-n">&#9632;</span><span><b>JROTC</b> — program names and brigade assignments.</span></li>
-        <li><span class="step-n">&#9632;</span><span><b>BSA</b> — council name, number, and HQ address.</span></li>
-        <li><span class="step-n">&#9632;</span><span><b>WP Applicants</b> — submission rate, offer rate, sports data, status breakdown.</span></li>
-        <li><span class="step-n">&#9632;</span><span><b>Gap Score</b> — status, score multiplier, pipeline signals.</span></li>
+        <li><span class="step-n">&#9632;</span><span><b>Health Data</b> — CDC PLACES community health metrics, including physical inactivity, obesity, smoking, diabetes, and insurance coverage rates.</span></li>
+        <li><span class="step-n">&#9632;</span><span><b>JROTC</b> — Program names and brigade assignments for all JROTC units in the ZIP.</span></li>
+        <li><span class="step-n">&#9632;</span><span><b>BSA</b> — Council name, council number, and headquarters address.</span></li>
+        <li><span class="step-n">&#9632;</span><span><b>WP Applicants</b> — Submission rate, offer rate, athletic data coverage, status breakdown by category, and lead source distribution.</span></li>
+        <li><span class="step-n">&#9632;</span><span><b>Gap Analysis</b> — Classification, gap score, pipeline signals, health multiplier, and score components.</span></li>
       </ul>
-      <div class="help-tip">Close the panel with the × button. The map resizes automatically.</div>
+      <div class="help-tip">Close the panel using the × button. The map viewport adjusts automatically.</div>
     `,
   },
   {
     title: 'Gap List Panel',
     content: `
-      <h2>Using the Gap List</h2>
-      <p>The <b>GAP LIST</b> tab on the left edge of the map opens a ranked list of the highest-priority gap areas.</p>
+      <h2>Gap List Panel</h2>
+      <p>The <b>GAP LIST</b> tab along the left edge of the map provides a ranked list of the highest-priority gap areas identified by the current analysis.</p>
       <ul class="help-steps-list">
-        <li><span class="step-n">1</span><span>Enable Gap Analysis first — the list only populates when the layer is active.</span></li>
-        <li><span class="step-n">2</span><span>Click any item in the list to fly the map to that ZIP code and open its info panel.</span></li>
-        <li><span class="step-n">3</span><span>Use the <b>Filter</b> buttons to show all gaps, only "Not on Radar", or only "Underrepresented".</span></li>
-        <li><span class="step-n">4</span><span>Filter by <b>Region</b> using the dropdown to focus on a specific WP admissions region.</span></li>
-        <li><span class="step-n">5</span><span>Adjust <b>Top N per region</b> to control how many results show per region.</span></li>
+        <li><span class="step-n">1</span><span>Gap Analysis must be active for the list to populate.</span></li>
+        <li><span class="step-n">2</span><span>Click any entry to navigate the map to that location and open its Info Panel.</span></li>
+        <li><span class="step-n">3</span><span>Use the <b>Filter</b> buttons to display all gaps, only <i>Not on Radar</i> areas, or only <i>Underrepresented</i> areas.</span></li>
+        <li><span class="step-n">4</span><span>Use the <b>Region</b> dropdown to restrict results to a specific WP admissions region.</span></li>
+        <li><span class="step-n">5</span><span>Adjust the <b>Top N per Region</b> field to control the number of results returned per region.</span></li>
       </ul>
     `,
   },
   {
-    title: 'Adding Custom Layers',
+    title: 'Custom Layers',
     content: `
-      <h2>Adding Your Own Data Source</h2>
-      <p>You can connect any public JSON API as a new map layer — no coding required.</p>
+      <h2>Adding Custom Data Layers</h2>
+      <p>Any publicly accessible JSON API can be connected as an additional map layer. No programming is required.</p>
       <ul class="help-steps-list">
         <li><span class="step-n">1</span><span>Click <span class="help-tag">+ Add Layer</span> in the toolbar.</span></li>
-        <li><span class="step-n">2</span><span>Enter a name and pick a color for the layer.</span></li>
-        <li><span class="step-n">3</span><span>Paste the API URL, then click <b>Detect Fields</b> to automatically discover the available field names.</span></li>
-        <li><span class="step-n">4</span><span>Choose whether the API has lat/lng coordinates or ZIP codes for location.</span></li>
-        <li><span class="step-n">5</span><span>Select which fields to show in the info panel when someone clicks a dot.</span></li>
-        <li><span class="step-n">6</span><span>Click <b>Add to Map</b> — the layer loads immediately and is saved for future sessions.</span></li>
+        <li><span class="step-n">2</span><span>Assign a name and display color to the layer.</span></li>
+        <li><span class="step-n">3</span><span>Paste the API endpoint URL, then click <b>Detect Fields</b> to automatically enumerate the available data fields.</span></li>
+        <li><span class="step-n">4</span><span>Specify whether the API returns geographic coordinates (latitude/longitude) or ZIP codes for location mapping.</span></li>
+        <li><span class="step-n">5</span><span>Select the fields to display in the Info Panel when a record is selected.</span></li>
+        <li><span class="step-n">6</span><span>Click <b>Add to Map</b> — the layer will load immediately and be persisted for future sessions.</span></li>
       </ul>
-      <div class="help-tip">Custom layers are saved in your browser and will reappear the next time you open this page. Click the × next to the button to remove a layer.</div>
+      <div class="help-tip">Custom layers are stored in the browser and will reload automatically in subsequent sessions. Click the × adjacent to the layer button to remove it.</div>
     `,
   },
 ];

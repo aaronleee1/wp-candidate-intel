@@ -1,127 +1,132 @@
-// ─── HIGH SCHOOLS LAYER (OpenStreetMap via Overpass API) ─────────────────────
+// ─── HIGH SCHOOLS LAYER (CDC PLACES — health metrics by ZIP, US only) ─────────
+
+const NCES_CACHE_KEY = 'wp_intel_nces_v13';
+const NCES_CACHE_TTL = 24 * 60 * 60 * 1000;
+
+const CDC_PLACES_URL = 'https://data.cdc.gov/resource/qnzd-25i4.json'; // ZCTA (ZIP) level
+
+const CDC_MEASURES = [
+  { id: 'LPA',      label: 'Physically Inactive (%)'  },
+  { id: 'OBESITY',  label: 'Obesity (%)'              },
+  { id: 'CSMOKING', label: 'Current Smokers (%)'      },
+  { id: 'DIABETES', label: 'Diabetes (%)'             },
+  { id: 'BPHIGH',   label: 'High Blood Pressure (%)'  },
+  { id: 'MHLTH',    label: 'Poor Mental Health (%)'   },
+  { id: 'PHLTH',    label: 'Poor Physical Health (%)' },
+  { id: 'ACCESS2',  label: 'No Health Insurance (%)'  },
+  { id: 'SLEEP',    label: 'Sleep < 7 Hours (%)'      },
+  { id: 'BINGE',    label: 'Binge Drinking (%)'       },
+];
+
+// US state abbreviations — used to filter out non-US territories
+const US_STATES = new Set([
+  'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA',
+  'KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',
+  'NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT',
+  'VA','WA','WV','WI','WY','DC'
+]);
 
 async function loadNCES() {
-  showLoading('Querying OpenStreetMap for US high schools...');
+  try {
+    const raw = localStorage.getItem(NCES_CACHE_KEY);
+    if (raw) {
+      const { ts, schools } = JSON.parse(raw);
+      if (Date.now() - ts < NCES_CACHE_TTL || !navigator.onLine) {
+        layers.nces.data = schools;
+        document.getElementById('stat-nces').textContent = `(${schools.length.toLocaleString()})`;
+        return;
+      }
+    }
+  } catch {}
 
-  // Indexed tag filters only — regex queries cause 504 timeouts on nationwide bbox.
-  // school:level=secondary and isced:level use inverted indexes (fast).
-  const bbox   = '(24,-125,50,-66)'; // continental US
-  const bboxAK = '(51,-180,72,-129)';
-  const bboxHI = '(18,-161,23,-154)';
-  const query = `[out:json][timeout:90];
-(
-  node["amenity"="school"]["school:level"="secondary"]${bbox};
-  node["amenity"="school"]["isced:level"="3"]${bbox};
-  way["amenity"="school"]["school:level"="secondary"]${bbox};
-  way["amenity"="school"]["isced:level"="3"]${bbox};
-  node["amenity"="school"]["school:level"="secondary"]${bboxAK};
-  way["amenity"="school"]["school:level"="secondary"]${bboxAK};
-  node["amenity"="school"]["school:level"="secondary"]${bboxHI};
-  way["amenity"="school"]["school:level"="secondary"]${bboxHI};
-);
-out center tags;`;
+  showLoading('Loading CDC PLACES health data...');
 
-  const postOpts = {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body:    'data=' + encodeURIComponent(query)
-  };
+  // ── Fetch all measures, build zip → {measureId: value} map ─────────────────
+  const zipHealth   = {};  // zip → { LPA: 25.3, stateabbr: 'CA', geolocation: {...} }
+  const zipMeta     = {};  // zip → { stateabbr, locationname, geolocation }
 
-  let res = null;
-  const mirrors = [
-    OVERPASS_API,
-    'https://overpass.kumi.systems/api/interpreter',
-    'https://overpass.openstreetmap.ru/api/interpreter'
-  ];
-  for (const url of mirrors) {
-    updateLoading(`Querying OpenStreetMap${url !== OVERPASS_API ? ' (mirror)' : ''}...`);
+  for (let i = 0; i < CDC_MEASURES.length; i++) {
+    const m = CDC_MEASURES[i];
+    updateLoading(`Fetching health data: ${m.label} (${i + 1}/${CDC_MEASURES.length})…`);
+
+    const params = new URLSearchParams({
+      measureid: m.id,
+      '$select':  'locationid,locationname,data_value,geolocation',
+      '$limit':   '50000'
+    });
+
     try {
-      res = await fetchWithTimeout(url, 100000, postOpts);
-      if (res.ok) break;
-    } catch { res = null; }
+      const res = await fetchWithTimeout(`${CDC_PLACES_URL}?${params}`, 20000);
+      if (!res.ok) { console.warn(`CDC ${m.id} HTTP ${res.status}`); continue; }
+      const rows = await res.json();
+
+      for (const r of rows) {
+        const zip = r.locationid;
+        if (!zip || zip.length !== 5) continue;
+
+        if (!zipHealth[zip]) zipHealth[zip] = {};
+        zipHealth[zip][m.id] = parseFloat(r.data_value) ?? null;
+
+        if (!zipMeta[zip] && r.geolocation) {
+          zipMeta[zip] = { locationname: r.locationname || zip, geolocation: r.geolocation };
+        }
+      }
+    } catch (e) {
+      console.warn(`CDC ${m.id} failed: ${e.message}`);
+    }
   }
-  if (!res || !res.ok) throw new Error('Could not reach the Overpass API. Check your internet connection.');
 
-  updateLoading('Parsing high school data...');
-  const data = await res.json();
-
-  const seen    = new Set();
+  // ── Build school records from ZIP metadata + health values ──────────────────
+  updateLoading('Building ZIP health records...');
   const schools = [];
 
-  for (const el of (data.elements || [])) {
-    if (seen.has(el.id)) { continue; } seen.add(el.id);
+  for (const [zip, meta] of Object.entries(zipMeta)) {
+    const geo = meta.geolocation;
+    let lat, lng;
+    if (geo.latitude  !== undefined) { lat = parseFloat(geo.latitude);      lng = parseFloat(geo.longitude); }
+    else if (geo.coordinates)        { lng = parseFloat(geo.coordinates[0]); lat = parseFloat(geo.coordinates[1]); }
+    else continue;
 
-    const lat = parseFloat(el.type === 'node' ? el.lat : el.center?.lat);
-    const lng = parseFloat(el.type === 'node' ? el.lon : el.center?.lon);
     if (!isValidCoord(lat, lng)) continue;
 
-    const t   = el.tags || {};
-    const zip = normalizeZip(t['addr:postcode'] || '');
-
     schools.push({
-      id:       el.id,
-      name:     t.name || 'Unknown School',
+      id:     zip,
+      name:   meta.locationname,
       lat, lng,
       zip,
-      city:     t['addr:city']  || t['addr:town'] || t['addr:hamlet'] || '',
-      state:    osmState(t['addr:state'] || ''),
-      street:   [t['addr:housenumber'], t['addr:street']].filter(Boolean).join(' '),
-      phone:    t.phone         || t['contact:phone']   || '',
-      website:  t.website       || t['contact:website'] || t.url || '',
-      operator: t.operator      || t['school:authority'] || '',
-      // fields kept for gap/sidebar compatibility
-      enrollment:     0,
-      teachers:       0,
-      district:       t.operator || '',
-      type:           osmSchoolType(t),
-      locale:         '',
-      titleIEligible: false,
-      magnet:         false,
-      charter:        (t['school:type'] || '').toLowerCase().includes('charter'),
-      virtual:        false,
-      bie:            false,
-      freeLunch:      0,
-      congressDist:   '',
-      stateLegLower:  '',
-      stateLegUpper:  '',
-      countyCode:     '',
-      cbsa:           ''
+      city:   zip,
+      state:  '',
+      health: zipHealth[zip]    || {},
+      // compatibility fields
+      street: '', phone: '', website: '', district: '',
+      type: 'Public', locale: '', charter: false, magnet: false,
+      enrollment: 0, teachers: 0, freeLunch: 0,
+      titleIEligible: false, virtual: false, bie: false,
+      congressDist: '', stateLegLower: '', stateLegUpper: '',
+      countyCode: '', cbsa: ''
     });
   }
+
+  // Geocode all ZIPs to get real city/state names (cached after first run)
+  const uniqueZips = [...new Set(schools.map(s => s.zip))];
+  updateLoading(`Geocoding ${uniqueZips.length.toLocaleString()} ZIP codes (cached after first run)…`);
+  const geoData = await geocodeMany(uniqueZips, (done, total) => {
+    updateLoading(`Geocoding health ZIPs… ${done.toLocaleString()}/${total.toLocaleString()}`);
+  });
+  for (const s of schools) {
+    const g = geoData[s.zip];
+    if (g) { s.city = g.city; s.state = g.state; }
+  }
+
+  try {
+    localStorage.setItem(NCES_CACHE_KEY, JSON.stringify({ ts: Date.now(), schools }));
+  } catch {}
 
   layers.nces.data = schools;
   document.getElementById('stat-nces').textContent = `(${schools.length.toLocaleString()})`;
 }
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
-
-function osmSchoolType(tags) {
-  const op = (tags['operator:type'] || '').toLowerCase();
-  const st = (tags['school:type']   || '').toLowerCase();
-  if (st.includes('charter'))  return 'Charter';
-  if (op === 'private')        return 'Private';
-  return 'Public';
-}
-
-function osmState(raw) {
-  if (!raw) return '';
-  const s = raw.trim();
-  if (s.length === 2) return s.toUpperCase();
-  const map = {
-    'Alabama':'AL','Alaska':'AK','Arizona':'AZ','Arkansas':'AR','California':'CA',
-    'Colorado':'CO','Connecticut':'CT','Delaware':'DE','Florida':'FL','Georgia':'GA',
-    'Hawaii':'HI','Idaho':'ID','Illinois':'IL','Indiana':'IN','Iowa':'IA','Kansas':'KS',
-    'Kentucky':'KY','Louisiana':'LA','Maine':'ME','Maryland':'MD','Massachusetts':'MA',
-    'Michigan':'MI','Minnesota':'MN','Mississippi':'MS','Missouri':'MO','Montana':'MT',
-    'Nebraska':'NE','Nevada':'NV','New Hampshire':'NH','New Jersey':'NJ',
-    'New Mexico':'NM','New York':'NY','North Carolina':'NC','North Dakota':'ND',
-    'Ohio':'OH','Oklahoma':'OK','Oregon':'OR','Pennsylvania':'PA','Rhode Island':'RI',
-    'South Carolina':'SC','South Dakota':'SD','Tennessee':'TN','Texas':'TX','Utah':'UT',
-    'Vermont':'VT','Virginia':'VA','Washington':'WA','West Virginia':'WV',
-    'Wisconsin':'WI','Wyoming':'WY','District of Columbia':'DC'
-  };
-  return map[s] || s.substring(0, 2).toUpperCase();
-}
 
 function ncesLocale(code) {
   if (!code || code < 0) return 'Unknown';
@@ -135,21 +140,22 @@ function renderNCES() {
   const schools = layers.nces.data;
   if (!schools || !schools.length) return;
 
-  if (layers.nces.heat && map.hasLayer(layers.nces.heat)) {
-    map.removeLayer(layers.nces.heat);
-  }
+  if (layers.nces.heat && map.hasLayer(layers.nces.heat)) map.removeLayer(layers.nces.heat);
   layers.nces.heat = null;
 
   layers.nces.heat = L.heatLayer(
     schools.map(s => [s.lat, s.lng, 0.6]),
-    { radius: 8, blur: 10, maxZoom: 12,
+    { radius: 11, blur: 13, maxZoom: 12,
       gradient: {
         0.0: 'rgba(0,0,0,0)',
-        0.4: 'rgba(24,100,171,0.2)',
-        0.7: 'rgba(77,171,247,0.3)',
-        1.0: 'rgba(165,243,252,0.4)'
-      } }
+        0.3: 'rgba(30,120,210,0.45)',
+        0.6: 'rgba(77,171,247,0.7)',
+        1.0: 'rgba(186,230,253,0.9)'
+      }
+    }
   );
 
   if (layers.nces.visible) showOnMap('nces');
 }
+
+window.NCES_HEALTH_MEASURES = CDC_MEASURES;
